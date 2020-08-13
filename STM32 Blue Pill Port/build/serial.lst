@@ -1,0 +1,1931 @@
+ARM GAS  /tmp/ccaiD5ge.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"serial.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.Serial_Init,"ax",%progbits
+  16              		.align	1
+  17              		.global	Serial_Init
+  18              		.arch armv7-m
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  22              		.fpu softvfp
+  24              	Serial_Init:
+  25              	.LFB86:
+  26              		.file 1 "Src/serial.c"
+   1:Src/serial.c  **** #include "serial.h"
+   2:Src/serial.c  **** #include "queue.h"
+   3:Src/serial.c  **** 
+   4:Src/serial.c  **** /* Exported variables ------------------------------------------------------*/
+   5:Src/serial.c  **** extern UART_HandleTypeDef huart1;
+   6:Src/serial.c  **** 
+   7:Src/serial.c  **** /* Private variables -------------------------------------------------------*/
+   8:Src/serial.c  **** // Runtime variables.
+   9:Src/serial.c  **** static TaskStatus_t Status = UNINIT;
+  10:Src/serial.c  **** static volatile Bool_t TxActive;
+  11:Src/serial.c  **** 
+  12:Src/serial.c  **** // Buffers & containers.
+  13:Src/serial.c  **** static uint8_t TxBufferContainer[SERIAL_TX_BUFFER_SIZE];
+  14:Src/serial.c  **** static uint8_t RxBufferContainer[SERIAL_RX_BUFFER_SIZE];
+  15:Src/serial.c  **** static Queue_Buffer_t TxBuffer;
+  16:Src/serial.c  **** static Queue_Buffer_t RxBuffer;
+  17:Src/serial.c  **** static uint8_t TxReg;
+  18:Src/serial.c  **** static uint8_t RxReg;
+  19:Src/serial.c  **** 
+  20:Src/serial.c  **** /* Exported functions ------------------------------------------------------*/
+  21:Src/serial.c  **** void Serial_Init(void)
+  22:Src/serial.c  **** {
+  27              		.loc 1 22 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  23:Src/serial.c  ****     // Guard for invalid operations.
+  24:Src/serial.c  ****     if (Status != UNINIT)
+  32              		.loc 1 24 5 view .LVU1
+  33              		.loc 1 24 16 is_stmt 0 view .LVU2
+  34 0000 0A4B     		ldr	r3, .L3
+ARM GAS  /tmp/ccaiD5ge.s 			page 2
+
+
+  35 0002 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  36              		.loc 1 24 8 view .LVU3
+  37 0004 83B9     		cbnz	r3, .L1
+  25:Src/serial.c  ****     {
+  26:Src/serial.c  ****         return;
+  27:Src/serial.c  ****     }
+  28:Src/serial.c  **** 
+  29:Src/serial.c  ****     // Initialize buffers.
+  30:Src/serial.c  ****     Queue_InitBuffer(&RxBuffer, RxBufferContainer, SERIAL_RX_BUFFER_SIZE);
+  38              		.loc 1 30 5 is_stmt 1 view .LVU4
+  39              	.LVL0:
+  40              	.LBB32:
+  41              	.LBI32:
+  42              		.file 2 "Inc/queue.h"
+   1:Inc/queue.h   **** /***
+   2:Inc/queue.h   ****   * @author     Onur Efe
+   3:Inc/queue.h   ****   */
+   4:Inc/queue.h   **** #ifndef __QUEUE_H
+   5:Inc/queue.h   **** #define __QUEUE_H
+   6:Inc/queue.h   **** 
+   7:Inc/queue.h   **** #ifdef __cplusplus
+   8:Inc/queue.h   **** extern "C"
+   9:Inc/queue.h   **** {
+  10:Inc/queue.h   ****     #endif
+  11:Inc/queue.h   **** 
+  12:Inc/queue.h   ****     /* Includes ------------------------------------------------------------------*/
+  13:Inc/queue.h   ****     #include "global.h"
+  14:Inc/queue.h   **** 
+  15:Inc/queue.h   ****       /* Exported macros ---------------------------------------------------------*/
+  16:Inc/queue.h   ****       /* Typedefs ------------------------------------------------------------------*/
+  17:Inc/queue.h   ****     typedef struct
+  18:Inc/queue.h   ****     {
+  19:Inc/queue.h   ****         uint16_t tail;
+  20:Inc/queue.h   ****         uint16_t head;
+  21:Inc/queue.h   ****         uint16_t size;
+  22:Inc/queue.h   ****         uint8_t *pContainer;
+  23:Inc/queue.h   ****     } Queue_Buffer_t;
+  24:Inc/queue.h   **** 
+  25:Inc/queue.h   ****     /* Exported functions --------------------------------------------------------*/
+  26:Inc/queue.h   ****     /***
+  27:Inc/queue.h   ****     * @Brief      Creates a buffer, allocates it's memory and returns the pointer
+  28:Inc/queue.h   ****     *             of it.
+  29:Inc/queue.h   ****     * @Params     buff-> Pointer to buffer.
+  30:Inc/queue.h   ****     *             container-> Pointer of the data container.
+  31:Inc/queue.h   ****     *             size-> Size of the data container.
+  32:Inc/queue.h   ****     *
+  33:Inc/queue.h   ****     * @Return     None.
+  34:Inc/queue.h   ****     */
+  35:Inc/queue.h   ****     static inline void Queue_InitBuffer(Queue_Buffer_t *buff, uint8_t *container, uint16_t size)
+  43              		.loc 2 35 24 view .LVU5
+  44              	.LBB33:
+  36:Inc/queue.h   ****     {
+  37:Inc/queue.h   ****         /* Initialize buffer. */
+  38:Inc/queue.h   ****         buff->head = 0;
+  45              		.loc 2 38 9 view .LVU6
+  46              		.loc 2 38 20 is_stmt 0 view .LVU7
+  47 0006 0A4B     		ldr	r3, .L3+4
+ARM GAS  /tmp/ccaiD5ge.s 			page 3
+
+
+  48 0008 0022     		movs	r2, #0
+  49 000a 5A80     		strh	r2, [r3, #2]	@ movhi
+  39:Inc/queue.h   ****         buff->tail = 0;
+  50              		.loc 2 39 9 is_stmt 1 view .LVU8
+  51              		.loc 2 39 20 is_stmt 0 view .LVU9
+  52 000c 1A80     		strh	r2, [r3]	@ movhi
+  40:Inc/queue.h   ****         buff->pContainer = container;
+  53              		.loc 2 40 9 is_stmt 1 view .LVU10
+  54              		.loc 2 40 26 is_stmt 0 view .LVU11
+  55 000e 0949     		ldr	r1, .L3+8
+  56 0010 9960     		str	r1, [r3, #8]
+  41:Inc/queue.h   ****         buff->size = size;
+  57              		.loc 2 41 9 is_stmt 1 view .LVU12
+  58              		.loc 2 41 20 is_stmt 0 view .LVU13
+  59 0012 1021     		movs	r1, #16
+  60 0014 9980     		strh	r1, [r3, #4]	@ movhi
+  61              	.LVL1:
+  62              		.loc 2 41 20 view .LVU14
+  63              	.LBE33:
+  64              	.LBE32:
+  31:Src/serial.c  ****     Queue_InitBuffer(&TxBuffer, TxBufferContainer, SERIAL_TX_BUFFER_SIZE);
+  65              		.loc 1 31 5 is_stmt 1 view .LVU15
+  66              	.LBB34:
+  67              	.LBI34:
+  35:Inc/queue.h   ****     {
+  68              		.loc 2 35 24 view .LVU16
+  69              	.LBB35:
+  38:Inc/queue.h   ****         buff->tail = 0;
+  70              		.loc 2 38 9 view .LVU17
+  38:Inc/queue.h   ****         buff->tail = 0;
+  71              		.loc 2 38 20 is_stmt 0 view .LVU18
+  72 0016 084B     		ldr	r3, .L3+12
+  73 0018 5A80     		strh	r2, [r3, #2]	@ movhi
+  39:Inc/queue.h   ****         buff->pContainer = container;
+  74              		.loc 2 39 9 is_stmt 1 view .LVU19
+  39:Inc/queue.h   ****         buff->pContainer = container;
+  75              		.loc 2 39 20 is_stmt 0 view .LVU20
+  76 001a 1A80     		strh	r2, [r3]	@ movhi
+  40:Inc/queue.h   ****         buff->size = size;
+  77              		.loc 2 40 9 is_stmt 1 view .LVU21
+  40:Inc/queue.h   ****         buff->size = size;
+  78              		.loc 2 40 26 is_stmt 0 view .LVU22
+  79 001c 074A     		ldr	r2, .L3+16
+  80 001e 9A60     		str	r2, [r3, #8]
+  81              		.loc 2 41 9 is_stmt 1 view .LVU23
+  82              		.loc 2 41 20 is_stmt 0 view .LVU24
+  83 0020 9980     		strh	r1, [r3, #4]	@ movhi
+  84              	.LVL2:
+  85              		.loc 2 41 20 view .LVU25
+  86              	.LBE35:
+  87              	.LBE34:
+  32:Src/serial.c  **** 
+  33:Src/serial.c  ****     Status = READY;
+  88              		.loc 1 33 5 is_stmt 1 view .LVU26
+  89              		.loc 1 33 12 is_stmt 0 view .LVU27
+  90 0022 024B     		ldr	r3, .L3
+  91 0024 0122     		movs	r2, #1
+ARM GAS  /tmp/ccaiD5ge.s 			page 4
+
+
+  92 0026 1A70     		strb	r2, [r3]
+  93              	.L1:
+  34:Src/serial.c  **** }
+  94              		.loc 1 34 1 view .LVU28
+  95 0028 7047     		bx	lr
+  96              	.L4:
+  97 002a 00BF     		.align	2
+  98              	.L3:
+  99 002c 00000000 		.word	.LANCHOR0
+ 100 0030 00000000 		.word	.LANCHOR1
+ 101 0034 00000000 		.word	.LANCHOR2
+ 102 0038 00000000 		.word	.LANCHOR3
+ 103 003c 00000000 		.word	.LANCHOR4
+ 104              		.cfi_endproc
+ 105              	.LFE86:
+ 107              		.section	.text.Serial_Start,"ax",%progbits
+ 108              		.align	1
+ 109              		.global	Serial_Start
+ 110              		.syntax unified
+ 111              		.thumb
+ 112              		.thumb_func
+ 113              		.fpu softvfp
+ 115              	Serial_Start:
+ 116              	.LFB87:
+  35:Src/serial.c  **** 
+  36:Src/serial.c  **** void Serial_Start(void)
+  37:Src/serial.c  **** {
+ 117              		.loc 1 37 1 is_stmt 1 view -0
+ 118              		.cfi_startproc
+ 119              		@ args = 0, pretend = 0, frame = 0
+ 120              		@ frame_needed = 0, uses_anonymous_args = 0
+ 121 0000 08B5     		push	{r3, lr}
+ 122              	.LCFI0:
+ 123              		.cfi_def_cfa_offset 8
+ 124              		.cfi_offset 3, -8
+ 125              		.cfi_offset 14, -4
+  38:Src/serial.c  ****     // Guard for invalid operations.
+  39:Src/serial.c  ****     if (Status != READY)
+ 126              		.loc 1 39 5 view .LVU30
+ 127              		.loc 1 39 16 is_stmt 0 view .LVU31
+ 128 0002 0D4B     		ldr	r3, .L11
+ 129 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 130              		.loc 1 39 8 view .LVU32
+ 131 0006 012B     		cmp	r3, #1
+ 132 0008 00D0     		beq	.L10
+ 133              	.L5:
+  40:Src/serial.c  ****     {
+  41:Src/serial.c  ****         return;
+  42:Src/serial.c  ****     }
+  43:Src/serial.c  **** 
+  44:Src/serial.c  ****     // Clear buffers.
+  45:Src/serial.c  ****     Queue_ClearBuffer(&RxBuffer);
+  46:Src/serial.c  ****     Queue_ClearBuffer(&TxBuffer);
+  47:Src/serial.c  **** 
+  48:Src/serial.c  ****     // Start receiving data.
+  49:Src/serial.c  ****     if (HAL_UART_Receive_IT(&huart1, &RxReg, sizeof(RxReg)) != HAL_OK)
+  50:Src/serial.c  ****     {
+ARM GAS  /tmp/ccaiD5ge.s 			page 5
+
+
+  51:Src/serial.c  ****         while (TRUE)
+  52:Src/serial.c  ****             ;
+  53:Src/serial.c  ****     }
+  54:Src/serial.c  **** 
+  55:Src/serial.c  ****     TxActive = FALSE;
+  56:Src/serial.c  ****     Status = OPERATING;
+  57:Src/serial.c  **** }
+ 134              		.loc 1 57 1 view .LVU33
+ 135 000a 08BD     		pop	{r3, pc}
+ 136              	.L10:
+  45:Src/serial.c  ****     Queue_ClearBuffer(&TxBuffer);
+ 137              		.loc 1 45 5 is_stmt 1 view .LVU34
+ 138              	.LVL3:
+ 139              	.LBB36:
+ 140              	.LBI36:
+  42:Inc/queue.h   ****     }
+  43:Inc/queue.h   **** 
+  44:Inc/queue.h   ****     /***
+  45:Inc/queue.h   ****     * @Brief      Clears the addressed buffer.
+  46:Inc/queue.h   ****     *
+  47:Inc/queue.h   ****     * @Params     buff-> Pointer to the buffer.
+  48:Inc/queue.h   ****     */
+  49:Inc/queue.h   ****     static inline void Queue_ClearBuffer(Queue_Buffer_t *buff)
+ 141              		.loc 2 49 24 view .LVU35
+ 142              	.LBB37:
+  50:Inc/queue.h   ****     {
+  51:Inc/queue.h   ****         buff->head = 0;
+ 143              		.loc 2 51 9 view .LVU36
+ 144              		.loc 2 51 20 is_stmt 0 view .LVU37
+ 145 000c 0B4A     		ldr	r2, .L11+4
+ 146 000e 0023     		movs	r3, #0
+ 147 0010 5380     		strh	r3, [r2, #2]	@ movhi
+  52:Inc/queue.h   ****         buff->tail = 0;
+ 148              		.loc 2 52 9 is_stmt 1 view .LVU38
+ 149              		.loc 2 52 20 is_stmt 0 view .LVU39
+ 150 0012 1380     		strh	r3, [r2]	@ movhi
+ 151              	.LVL4:
+ 152              		.loc 2 52 20 view .LVU40
+ 153              	.LBE37:
+ 154              	.LBE36:
+  46:Src/serial.c  **** 
+ 155              		.loc 1 46 5 is_stmt 1 view .LVU41
+ 156              	.LBB38:
+ 157              	.LBI38:
+  49:Inc/queue.h   ****     {
+ 158              		.loc 2 49 24 view .LVU42
+ 159              	.LBB39:
+  51:Inc/queue.h   ****         buff->tail = 0;
+ 160              		.loc 2 51 9 view .LVU43
+  51:Inc/queue.h   ****         buff->tail = 0;
+ 161              		.loc 2 51 20 is_stmt 0 view .LVU44
+ 162 0014 0A4A     		ldr	r2, .L11+8
+ 163 0016 5380     		strh	r3, [r2, #2]	@ movhi
+ 164              		.loc 2 52 9 is_stmt 1 view .LVU45
+ 165              		.loc 2 52 20 is_stmt 0 view .LVU46
+ 166 0018 1380     		strh	r3, [r2]	@ movhi
+ 167              	.LVL5:
+ARM GAS  /tmp/ccaiD5ge.s 			page 6
+
+
+ 168              		.loc 2 52 20 view .LVU47
+ 169              	.LBE39:
+ 170              	.LBE38:
+  49:Src/serial.c  ****     {
+ 171              		.loc 1 49 5 is_stmt 1 view .LVU48
+  49:Src/serial.c  ****     {
+ 172              		.loc 1 49 9 is_stmt 0 view .LVU49
+ 173 001a 0122     		movs	r2, #1
+ 174 001c 0949     		ldr	r1, .L11+12
+ 175 001e 0A48     		ldr	r0, .L11+16
+ 176 0020 FFF7FEFF 		bl	HAL_UART_Receive_IT
+ 177              	.LVL6:
+  49:Src/serial.c  ****     {
+ 178              		.loc 1 49 8 view .LVU50
+ 179 0024 00B1     		cbz	r0, .L7
+ 180              	.L8:
+  51:Src/serial.c  ****             ;
+ 181              		.loc 1 51 9 is_stmt 1 discriminator 1 view .LVU51
+  52:Src/serial.c  ****     }
+ 182              		.loc 1 52 13 discriminator 1 view .LVU52
+ 183 0026 FEE7     		b	.L8
+ 184              	.L7:
+  55:Src/serial.c  ****     Status = OPERATING;
+ 185              		.loc 1 55 5 view .LVU53
+  55:Src/serial.c  ****     Status = OPERATING;
+ 186              		.loc 1 55 14 is_stmt 0 view .LVU54
+ 187 0028 084B     		ldr	r3, .L11+20
+ 188 002a 0022     		movs	r2, #0
+ 189 002c 1A70     		strb	r2, [r3]
+  56:Src/serial.c  **** }
+ 190              		.loc 1 56 5 is_stmt 1 view .LVU55
+  56:Src/serial.c  **** }
+ 191              		.loc 1 56 12 is_stmt 0 view .LVU56
+ 192 002e 024B     		ldr	r3, .L11
+ 193 0030 0222     		movs	r2, #2
+ 194 0032 1A70     		strb	r2, [r3]
+ 195 0034 E9E7     		b	.L5
+ 196              	.L12:
+ 197 0036 00BF     		.align	2
+ 198              	.L11:
+ 199 0038 00000000 		.word	.LANCHOR0
+ 200 003c 00000000 		.word	.LANCHOR1
+ 201 0040 00000000 		.word	.LANCHOR3
+ 202 0044 00000000 		.word	.LANCHOR5
+ 203 0048 00000000 		.word	huart1
+ 204 004c 00000000 		.word	.LANCHOR6
+ 205              		.cfi_endproc
+ 206              	.LFE87:
+ 208              		.section	.text.Serial_Execute,"ax",%progbits
+ 209              		.align	1
+ 210              		.global	Serial_Execute
+ 211              		.syntax unified
+ 212              		.thumb
+ 213              		.thumb_func
+ 214              		.fpu softvfp
+ 216              	Serial_Execute:
+ 217              	.LFB88:
+ARM GAS  /tmp/ccaiD5ge.s 			page 7
+
+
+  58:Src/serial.c  **** 
+  59:Src/serial.c  **** void Serial_Execute(void)
+  60:Src/serial.c  **** {
+ 218              		.loc 1 60 1 is_stmt 1 view -0
+ 219              		.cfi_startproc
+ 220              		@ args = 0, pretend = 0, frame = 0
+ 221              		@ frame_needed = 0, uses_anonymous_args = 0
+ 222              		@ link register save eliminated.
+  61:Src/serial.c  ****     // Guard for invalid operations.
+  62:Src/serial.c  ****     if (Status != OPERATING)
+ 223              		.loc 1 62 5 view .LVU58
+  63:Src/serial.c  ****     {
+  64:Src/serial.c  ****         return;
+  65:Src/serial.c  ****     }
+  66:Src/serial.c  **** }
+ 224              		.loc 1 66 1 is_stmt 0 view .LVU59
+ 225 0000 7047     		bx	lr
+ 226              		.cfi_endproc
+ 227              	.LFE88:
+ 229              		.section	.text.Serial_Stop,"ax",%progbits
+ 230              		.align	1
+ 231              		.global	Serial_Stop
+ 232              		.syntax unified
+ 233              		.thumb
+ 234              		.thumb_func
+ 235              		.fpu softvfp
+ 237              	Serial_Stop:
+ 238              	.LFB89:
+  67:Src/serial.c  **** 
+  68:Src/serial.c  **** void Serial_Stop(void)
+  69:Src/serial.c  **** {
+ 239              		.loc 1 69 1 is_stmt 1 view -0
+ 240              		.cfi_startproc
+ 241              		@ args = 0, pretend = 0, frame = 0
+ 242              		@ frame_needed = 0, uses_anonymous_args = 0
+ 243 0000 08B5     		push	{r3, lr}
+ 244              	.LCFI1:
+ 245              		.cfi_def_cfa_offset 8
+ 246              		.cfi_offset 3, -8
+ 247              		.cfi_offset 14, -4
+  70:Src/serial.c  ****     // Guard for invalid operations.
+  71:Src/serial.c  ****     if (Status != OPERATING)
+ 248              		.loc 1 71 5 view .LVU61
+ 249              		.loc 1 71 16 is_stmt 0 view .LVU62
+ 250 0002 064B     		ldr	r3, .L18
+ 251 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 252              		.loc 1 71 8 view .LVU63
+ 253 0006 022B     		cmp	r3, #2
+ 254 0008 00D0     		beq	.L17
+ 255              	.L14:
+  72:Src/serial.c  ****     {
+  73:Src/serial.c  ****         return;
+  74:Src/serial.c  ****     }
+  75:Src/serial.c  **** 
+  76:Src/serial.c  ****     HAL_UART_Abort_IT(&huart1);
+  77:Src/serial.c  ****     Status = READY;
+  78:Src/serial.c  **** }
+ARM GAS  /tmp/ccaiD5ge.s 			page 8
+
+
+ 256              		.loc 1 78 1 view .LVU64
+ 257 000a 08BD     		pop	{r3, pc}
+ 258              	.L17:
+  76:Src/serial.c  ****     Status = READY;
+ 259              		.loc 1 76 5 is_stmt 1 view .LVU65
+ 260 000c 0448     		ldr	r0, .L18+4
+ 261 000e FFF7FEFF 		bl	HAL_UART_Abort_IT
+ 262              	.LVL7:
+  77:Src/serial.c  **** }
+ 263              		.loc 1 77 5 view .LVU66
+  77:Src/serial.c  **** }
+ 264              		.loc 1 77 12 is_stmt 0 view .LVU67
+ 265 0012 024B     		ldr	r3, .L18
+ 266 0014 0122     		movs	r2, #1
+ 267 0016 1A70     		strb	r2, [r3]
+ 268 0018 F7E7     		b	.L14
+ 269              	.L19:
+ 270 001a 00BF     		.align	2
+ 271              	.L18:
+ 272 001c 00000000 		.word	.LANCHOR0
+ 273 0020 00000000 		.word	huart1
+ 274              		.cfi_endproc
+ 275              	.LFE89:
+ 277              		.section	.text.Serial_TxBuffAvailable,"ax",%progbits
+ 278              		.align	1
+ 279              		.global	Serial_TxBuffAvailable
+ 280              		.syntax unified
+ 281              		.thumb
+ 282              		.thumb_func
+ 283              		.fpu softvfp
+ 285              	Serial_TxBuffAvailable:
+ 286              	.LFB90:
+  79:Src/serial.c  **** 
+  80:Src/serial.c  **** Bool_t Serial_TxBuffAvailable(void)
+  81:Src/serial.c  **** {
+ 287              		.loc 1 81 1 is_stmt 1 view -0
+ 288              		.cfi_startproc
+ 289              		@ args = 0, pretend = 0, frame = 0
+ 290              		@ frame_needed = 0, uses_anonymous_args = 0
+ 291              		@ link register save eliminated.
+  82:Src/serial.c  ****     return (!Queue_IsFull(&TxBuffer));
+ 292              		.loc 1 82 5 view .LVU69
+ 293              	.LVL8:
+ 294              	.LBB40:
+ 295              	.LBI40:
+  53:Inc/queue.h   ****     }
+  54:Inc/queue.h   **** 
+  55:Inc/queue.h   ****     /***
+  56:Inc/queue.h   ****     * @Brief      Enqueues byte to the given buffer.
+  57:Inc/queue.h   ****     *
+  58:Inc/queue.h   ****     * @Params     buff-> Pointer to the buffer.
+  59:Inc/queue.h   ****     *             byte-> Byte to be enqueued.
+  60:Inc/queue.h   ****     */
+  61:Inc/queue.h   ****     static inline void Queue_Enqueue(Queue_Buffer_t *buff, uint8_t byte)
+  62:Inc/queue.h   ****     {
+  63:Inc/queue.h   ****         uint16_t __tail = buff->tail;
+  64:Inc/queue.h   **** 
+ARM GAS  /tmp/ccaiD5ge.s 			page 9
+
+
+  65:Inc/queue.h   ****         // Set new tail element and update the tail value.
+  66:Inc/queue.h   ****         buff->pContainer[__tail++] = byte;
+  67:Inc/queue.h   ****         if (__tail == buff->size)
+  68:Inc/queue.h   ****         {
+  69:Inc/queue.h   ****             __tail = 0;
+  70:Inc/queue.h   ****         }
+  71:Inc/queue.h   **** 
+  72:Inc/queue.h   ****         buff->tail = __tail;
+  73:Inc/queue.h   ****     }
+  74:Inc/queue.h   **** 
+  75:Inc/queue.h   ****     /***
+  76:Inc/queue.h   ****     * @Brief      Enqueues byte array to the given buffer.
+  77:Inc/queue.h   ****     *
+  78:Inc/queue.h   ****     * @Params     buff-> Pointer to the buffer.
+  79:Inc/queue.h   ****     *             data-> Pointer to byte array to be enqueued.
+  80:Inc/queue.h   ****     */
+  81:Inc/queue.h   ****     static inline void Queue_EnqueueArr(Queue_Buffer_t *buff, uint8_t *data, uint16_t dataLength)
+  82:Inc/queue.h   ****     {
+  83:Inc/queue.h   ****         uint16_t __tail = buff->tail;
+  84:Inc/queue.h   **** 
+  85:Inc/queue.h   ****         for (uint16_t i = 0; i < dataLength; i++)
+  86:Inc/queue.h   ****         {
+  87:Inc/queue.h   ****             buff->pContainer[__tail++] = data[i];
+  88:Inc/queue.h   ****             if (__tail == buff->size)
+  89:Inc/queue.h   ****             {
+  90:Inc/queue.h   ****                 __tail = 0;
+  91:Inc/queue.h   ****             }
+  92:Inc/queue.h   ****         }
+  93:Inc/queue.h   **** 
+  94:Inc/queue.h   ****         buff->tail = __tail;
+  95:Inc/queue.h   ****     }
+  96:Inc/queue.h   **** 
+  97:Inc/queue.h   ****     /***
+  98:Inc/queue.h   ****     * @Brief      Dequeues byte from the given buffer.
+  99:Inc/queue.h   ****     *
+ 100:Inc/queue.h   ****     * @Params     buff-> Pointer to the buffer.
+ 101:Inc/queue.h   ****     *
+ 102:Inc/queue.h   ****     * @Return     Byte.
+ 103:Inc/queue.h   ****     */
+ 104:Inc/queue.h   ****     static inline uint8_t Queue_Dequeue(Queue_Buffer_t *buff)
+ 105:Inc/queue.h   ****     {
+ 106:Inc/queue.h   ****         uint16_t __head = buff->head;
+ 107:Inc/queue.h   **** 
+ 108:Inc/queue.h   ****         // Parse head element.
+ 109:Inc/queue.h   ****         uint8_t element = buff->pContainer[__head++];
+ 110:Inc/queue.h   ****         if (__head == buff->size)
+ 111:Inc/queue.h   ****         {
+ 112:Inc/queue.h   ****             __head = 0;
+ 113:Inc/queue.h   ****         }
+ 114:Inc/queue.h   **** 
+ 115:Inc/queue.h   ****         buff->head = __head;
+ 116:Inc/queue.h   **** 
+ 117:Inc/queue.h   ****         return element;
+ 118:Inc/queue.h   ****     }
+ 119:Inc/queue.h   **** 
+ 120:Inc/queue.h   ****     /***
+ 121:Inc/queue.h   ****     * @Brief      Dequeues array from the given buffer.
+ARM GAS  /tmp/ccaiD5ge.s 			page 10
+
+
+ 122:Inc/queue.h   ****     *
+ 123:Inc/queue.h   ****     * @Params     buff-> Pointer to the buffer.
+ 124:Inc/queue.h   ****     *
+ 125:Inc/queue.h   ****     * @Return     None.
+ 126:Inc/queue.h   ****     */
+ 127:Inc/queue.h   ****     static inline void Queue_DequeueArr(Queue_Buffer_t *buff, uint8_t *data, uint16_t dataLength)
+ 128:Inc/queue.h   ****     {
+ 129:Inc/queue.h   ****         uint16_t __head = buff->head;
+ 130:Inc/queue.h   **** 
+ 131:Inc/queue.h   ****         for (uint16_t i = 0; i < dataLength; i++)
+ 132:Inc/queue.h   ****         {
+ 133:Inc/queue.h   ****             data[i] = buff->pContainer[__head++];
+ 134:Inc/queue.h   ****             if (__head == buff->size)
+ 135:Inc/queue.h   ****             {
+ 136:Inc/queue.h   ****                 __head = 0;
+ 137:Inc/queue.h   ****             }
+ 138:Inc/queue.h   ****         }
+ 139:Inc/queue.h   **** 
+ 140:Inc/queue.h   ****         buff->head = __head;
+ 141:Inc/queue.h   ****     }
+ 142:Inc/queue.h   **** 
+ 143:Inc/queue.h   ****     /***
+ 144:Inc/queue.h   ****     * @Brief      Returns number of elements the buffer contains.
+ 145:Inc/queue.h   ****     *
+ 146:Inc/queue.h   ****     * @Params     buff-> Buffer pointer.
+ 147:Inc/queue.h   ****     *
+ 148:Inc/queue.h   ****     * @Return     Element count.
+ 149:Inc/queue.h   ****     */
+ 150:Inc/queue.h   ****     static inline uint16_t Queue_GetElementCount(Queue_Buffer_t *buff)
+ 151:Inc/queue.h   ****     {
+ 152:Inc/queue.h   ****         int32_t elements = buff->tail - buff->head;
+ 153:Inc/queue.h   ****         if (elements < 0)
+ 154:Inc/queue.h   ****         {
+ 155:Inc/queue.h   ****             elements += buff->size;
+ 156:Inc/queue.h   ****         }
+ 157:Inc/queue.h   **** 
+ 158:Inc/queue.h   ****         return ((uint16_t)elements);
+ 159:Inc/queue.h   ****     }
+ 160:Inc/queue.h   **** 
+ 161:Inc/queue.h   ****     /***
+ 162:Inc/queue.h   ****     * @Brief      Removes elements starting from the head.
+ 163:Inc/queue.h   ****     *
+ 164:Inc/queue.h   ****     * @Params     buff-> Pointer to the buffer.
+ 165:Inc/queue.h   ****     *             length-> Length of removal.
+ 166:Inc/queue.h   ****     *
+ 167:Inc/queue.h   ****     * @Return     None.
+ 168:Inc/queue.h   ****     */
+ 169:Inc/queue.h   ****     static inline void Queue_Remove(Queue_Buffer_t *buff, uint16_t length)
+ 170:Inc/queue.h   ****     {
+ 171:Inc/queue.h   ****         /* Just change head index. */
+ 172:Inc/queue.h   ****         if (length <= Queue_GetElementCount(buff))
+ 173:Inc/queue.h   ****         {
+ 174:Inc/queue.h   ****             uint16_t __head = buff->head;
+ 175:Inc/queue.h   ****             __head += length;
+ 176:Inc/queue.h   ****             if (__head >= buff->size)
+ 177:Inc/queue.h   ****             {
+ 178:Inc/queue.h   ****                 __head -= buff->size;
+ARM GAS  /tmp/ccaiD5ge.s 			page 11
+
+
+ 179:Inc/queue.h   ****             }
+ 180:Inc/queue.h   ****             buff->head = __head;
+ 181:Inc/queue.h   ****         }
+ 182:Inc/queue.h   ****     }
+ 183:Inc/queue.h   **** 
+ 184:Inc/queue.h   ****     /***
+ 185:Inc/queue.h   ****     * @Brief      Peeks element in the buffer. Indexing starts at the first element.
+ 186:Inc/queue.h   ****     *
+ 187:Inc/queue.h   ****     * @Params     buff-> Pointer to the buffer.
+ 188:Inc/queue.h   ****     *             		elementIndex-> Index of the element.
+ 189:Inc/queue.h   ****     *
+ 190:Inc/queue.h   ****     * @Return     Element value.
+ 191:Inc/queue.h   ****     */
+ 192:Inc/queue.h   ****     static inline uint8_t Queue_Peek(Queue_Buffer_t *buff, uint16_t elementIndex)
+ 193:Inc/queue.h   ****     {
+ 194:Inc/queue.h   ****         uint16_t element_position = buff->head + elementIndex;
+ 195:Inc/queue.h   ****         if (element_position >= buff->size)
+ 196:Inc/queue.h   ****         {
+ 197:Inc/queue.h   ****             element_position -= buff->size;
+ 198:Inc/queue.h   ****         }
+ 199:Inc/queue.h   **** 
+ 200:Inc/queue.h   ****         return (buff->pContainer[element_position]);
+ 201:Inc/queue.h   ****     }
+ 202:Inc/queue.h   **** 
+ 203:Inc/queue.h   ****     /***
+ 204:Inc/queue.h   ****     * @Brief      Searches an element in the buffer. Returns element index if the element
+ 205:Inc/queue.h   ****     *             exists. Returns 0xFFFF otherwise.
+ 206:Inc/queue.h   ****     *
+ 207:Inc/queue.h   ****     * @Params     buff-> Buffer to be searched.
+ 208:Inc/queue.h   ****     *             	element-> Element value.
+ 209:Inc/queue.h   ****     *
+ 210:Inc/queue.h   ****     * @Return     Element index or 0xFFFF.
+ 211:Inc/queue.h   ****     */
+ 212:Inc/queue.h   ****     static inline uint16_t Queue_Search(Queue_Buffer_t *buff, uint8_t element)
+ 213:Inc/queue.h   ****     {
+ 214:Inc/queue.h   ****         uint16_t num_of_elements;
+ 215:Inc/queue.h   ****         num_of_elements = Queue_GetElementCount(buff);
+ 216:Inc/queue.h   **** 
+ 217:Inc/queue.h   ****         // Search buffer.
+ 218:Inc/queue.h   ****         for (uint16_t i = 0; i < num_of_elements; i++)
+ 219:Inc/queue.h   ****         {
+ 220:Inc/queue.h   ****             if (Queue_Peek(buff, i) == element)
+ 221:Inc/queue.h   ****             {
+ 222:Inc/queue.h   ****                 return i;
+ 223:Inc/queue.h   ****             }
+ 224:Inc/queue.h   ****         }
+ 225:Inc/queue.h   **** 
+ 226:Inc/queue.h   ****         return 0xFFFF;
+ 227:Inc/queue.h   ****     }
+ 228:Inc/queue.h   **** 
+ 229:Inc/queue.h   ****     /***
+ 230:Inc/queue.h   ****     * @Brief      Searches an array in the buffer. Returns array start index if the such an array
+ 231:Inc/queue.h   ****     *             exists. Returns 0xFFFF otherwise.
+ 232:Inc/queue.h   ****     *
+ 233:Inc/queue.h   ****     * @Params     buff-> Buffer to be searched.
+ 234:Inc/queue.h   ****     *             arr-> Pointer to array.
+ 235:Inc/queue.h   ****     *
+ARM GAS  /tmp/ccaiD5ge.s 			page 12
+
+
+ 236:Inc/queue.h   ****     * @Return     Array start index or 0xFFFF.
+ 237:Inc/queue.h   ****     */
+ 238:Inc/queue.h   ****     static inline uint16_t Queue_SearchArr(Queue_Buffer_t *buff, uint8_t *arr, uint16_t arrLength)
+ 239:Inc/queue.h   ****     {
+ 240:Inc/queue.h   ****         uint16_t num_of_elements;
+ 241:Inc/queue.h   ****         num_of_elements = Queue_GetElementCount(buff);
+ 242:Inc/queue.h   **** 
+ 243:Inc/queue.h   ****         // Search buffer.
+ 244:Inc/queue.h   ****         for (uint16_t i = 0; i < num_of_elements; i++)
+ 245:Inc/queue.h   ****         {
+ 246:Inc/queue.h   ****             Bool_t matched = TRUE;
+ 247:Inc/queue.h   ****             for (uint16_t j = 0; j < arrLength; j++)
+ 248:Inc/queue.h   ****             {
+ 249:Inc/queue.h   ****                 if (Queue_Peek(buff, i + j) != arr[j])
+ 250:Inc/queue.h   ****                 {
+ 251:Inc/queue.h   ****                     matched = FALSE;
+ 252:Inc/queue.h   ****                     continue;
+ 253:Inc/queue.h   ****                 }
+ 254:Inc/queue.h   ****             }
+ 255:Inc/queue.h   **** 
+ 256:Inc/queue.h   ****             // If match found; return the start index.
+ 257:Inc/queue.h   ****             if (matched)
+ 258:Inc/queue.h   ****             {
+ 259:Inc/queue.h   ****                 return i;
+ 260:Inc/queue.h   ****             }
+ 261:Inc/queue.h   ****         }
+ 262:Inc/queue.h   **** 
+ 263:Inc/queue.h   ****         return 0xFFFF;
+ 264:Inc/queue.h   ****     }
+ 265:Inc/queue.h   **** 
+ 266:Inc/queue.h   ****     static inline void Queue_PeekArr(Queue_Buffer_t *buff, uint16_t idx, uint8_t *data,
+ 267:Inc/queue.h   ****         uint16_t dataLength)
+ 268:Inc/queue.h   ****     {
+ 269:Inc/queue.h   ****         uint16_t __head = buff->head + idx;
+ 270:Inc/queue.h   ****         if (__head >= buff->size)
+ 271:Inc/queue.h   ****         {
+ 272:Inc/queue.h   ****             __head -= buff->size;
+ 273:Inc/queue.h   ****         }
+ 274:Inc/queue.h   **** 
+ 275:Inc/queue.h   ****         for (uint16_t i = 0; i < dataLength; i++)
+ 276:Inc/queue.h   ****         {
+ 277:Inc/queue.h   ****             data[i] = buff->pContainer[__head++];
+ 278:Inc/queue.h   ****             if (__head == buff->size)
+ 279:Inc/queue.h   ****             {
+ 280:Inc/queue.h   ****                 __head = 0;
+ 281:Inc/queue.h   ****             }
+ 282:Inc/queue.h   ****         }
+ 283:Inc/queue.h   ****     }
+ 284:Inc/queue.h   **** 
+ 285:Inc/queue.h   ****     static inline void Queue_WriteArr(Queue_Buffer_t *buff, uint16_t idx, uint8_t *data,
+ 286:Inc/queue.h   ****         uint16_t dataLength)
+ 287:Inc/queue.h   ****     {
+ 288:Inc/queue.h   ****         uint16_t __head = buff->head + idx;
+ 289:Inc/queue.h   ****         if (__head >= buff->size)
+ 290:Inc/queue.h   ****         {
+ 291:Inc/queue.h   ****             __head -= buff->size;
+ 292:Inc/queue.h   ****         }
+ARM GAS  /tmp/ccaiD5ge.s 			page 13
+
+
+ 293:Inc/queue.h   **** 
+ 294:Inc/queue.h   ****         for (uint16_t i = 0; i < dataLength; i++)
+ 295:Inc/queue.h   ****         {
+ 296:Inc/queue.h   ****             buff->pContainer[__head++] = data[i];
+ 297:Inc/queue.h   ****             if (__head == buff->size)
+ 298:Inc/queue.h   ****             {
+ 299:Inc/queue.h   ****                 __head = 0;
+ 300:Inc/queue.h   ****             }
+ 301:Inc/queue.h   ****         }
+ 302:Inc/queue.h   ****     }
+ 303:Inc/queue.h   **** 
+ 304:Inc/queue.h   ****     static inline uint8_t *Queue_GetPtr(Queue_Buffer_t *buff, uint16_t idx)
+ 305:Inc/queue.h   ****     {
+ 306:Inc/queue.h   ****         uint16_t element_position = buff->head + idx;
+ 307:Inc/queue.h   ****         if (element_position >= buff->size)
+ 308:Inc/queue.h   ****         {
+ 309:Inc/queue.h   ****             element_position -= buff->size;
+ 310:Inc/queue.h   ****         }
+ 311:Inc/queue.h   **** 
+ 312:Inc/queue.h   ****         return (&buff->pContainer[element_position]);
+ 313:Inc/queue.h   ****     }
+ 314:Inc/queue.h   **** 
+ 315:Inc/queue.h   ****     /***
+ 316:Inc/queue.h   ****     * @Brief      Sets element in the buffer. Indexing starts at the first element.
+ 317:Inc/queue.h   ****     *
+ 318:Inc/queue.h   ****     * @Params     buff-> Pointer to the buffer.
+ 319:Inc/queue.h   ****     *             elementIndex-> Index of the element.
+ 320:Inc/queue.h   ****     *             value-> Value of the element to be set.
+ 321:Inc/queue.h   ****     *
+ 322:Inc/queue.h   ****     * @Return     None.
+ 323:Inc/queue.h   ****     */
+ 324:Inc/queue.h   ****     static inline void Queue_Set(Queue_Buffer_t *buff, uint16_t elementIndex, uint8_t value)
+ 325:Inc/queue.h   ****     {
+ 326:Inc/queue.h   ****         uint16_t element_position = buff->head + elementIndex;
+ 327:Inc/queue.h   ****         if (element_position >= buff->size)
+ 328:Inc/queue.h   ****         {
+ 329:Inc/queue.h   ****             element_position -= buff->size;
+ 330:Inc/queue.h   ****         }
+ 331:Inc/queue.h   **** 
+ 332:Inc/queue.h   ****         buff->pContainer[element_position] = value;
+ 333:Inc/queue.h   ****     }
+ 334:Inc/queue.h   **** 
+ 335:Inc/queue.h   ****     /***
+ 336:Inc/queue.h   ****     * @Brief      Gets index of next write take place.
+ 337:Inc/queue.h   ****     *
+ 338:Inc/queue.h   ****     * @Params      buff-> Pointer to the buffer.
+ 339:Inc/queue.h   ****     *
+ 340:Inc/queue.h   ****     * @Return     Index.
+ 341:Inc/queue.h   ****     */
+ 342:Inc/queue.h   ****     static inline uint16_t Queue_GetCurrentIdx(Queue_Buffer_t *buff)
+ 343:Inc/queue.h   ****     {
+ 344:Inc/queue.h   ****         int32_t element_position = buff->tail - buff->head;
+ 345:Inc/queue.h   ****         if (element_position < 0)
+ 346:Inc/queue.h   ****         {
+ 347:Inc/queue.h   ****             element_position += buff->size;
+ 348:Inc/queue.h   ****         }
+ 349:Inc/queue.h   **** 
+ARM GAS  /tmp/ccaiD5ge.s 			page 14
+
+
+ 350:Inc/queue.h   ****         return ((uint16_t)element_position);
+ 351:Inc/queue.h   ****     }
+ 352:Inc/queue.h   **** 
+ 353:Inc/queue.h   ****     /***
+ 354:Inc/queue.h   ****     * @Brief      Returns available space of the buffer.
+ 355:Inc/queue.h   ****     *
+ 356:Inc/queue.h   ****     * @Params     buff-> Buffer pointer.
+ 357:Inc/queue.h   ****     *
+ 358:Inc/queue.h   ****     * @Return     Available space.
+ 359:Inc/queue.h   ****     */
+ 360:Inc/queue.h   ****     static inline uint16_t Queue_GetAvailableSpace(Queue_Buffer_t *buff)
+ 361:Inc/queue.h   ****     {
+ 362:Inc/queue.h   ****         int32_t elements = buff->tail - buff->head;
+ 363:Inc/queue.h   ****         if (elements < 0)
+ 364:Inc/queue.h   ****         {
+ 365:Inc/queue.h   ****             elements += buff->size;
+ 366:Inc/queue.h   ****         }
+ 367:Inc/queue.h   **** 
+ 368:Inc/queue.h   ****         return (buff->size - (elements + 1));
+ 369:Inc/queue.h   ****     }
+ 370:Inc/queue.h   **** 
+ 371:Inc/queue.h   ****     /***
+ 372:Inc/queue.h   ****     * @Brief      Checks if the buffer is empty.
+ 373:Inc/queue.h   ****     *
+ 374:Inc/queue.h   ****     * @Params     buff-> Pointer to buffer.
+ 375:Inc/queue.h   ****     *
+ 376:Inc/queue.h   ****     * @Return     TRUE or FALSE.
+ 377:Inc/queue.h   ****     */
+ 378:Inc/queue.h   ****     static inline Bool_t Queue_IsEmpty(Queue_Buffer_t *buff)
+ 379:Inc/queue.h   ****     {
+ 380:Inc/queue.h   ****         return ((buff->tail == buff->head) ? TRUE : FALSE);
+ 381:Inc/queue.h   ****     }
+ 382:Inc/queue.h   **** 
+ 383:Inc/queue.h   ****     /***
+ 384:Inc/queue.h   ****     * @Brief      Checks if the buffer is full.
+ 385:Inc/queue.h   ****     *
+ 386:Inc/queue.h   ****     * @Params     buff-> Pointer to buffer.
+ 387:Inc/queue.h   ****     *
+ 388:Inc/queue.h   ****     * @Return     TRUE or FALSE.
+ 389:Inc/queue.h   ****     */
+ 390:Inc/queue.h   ****     static inline Bool_t Queue_IsFull(Queue_Buffer_t *buff)
+ 296              		.loc 2 390 26 view .LVU70
+ 297              	.LBB41:
+ 391:Inc/queue.h   ****     {
+ 392:Inc/queue.h   ****         uint16_t next_tail = (buff->tail + 1);
+ 298              		.loc 2 392 9 view .LVU71
+ 299              		.loc 2 392 35 is_stmt 0 view .LVU72
+ 300 0000 074A     		ldr	r2, .L24
+ 301 0002 1388     		ldrh	r3, [r2]
+ 302              		.loc 2 392 18 view .LVU73
+ 303 0004 0133     		adds	r3, r3, #1
+ 304 0006 9BB2     		uxth	r3, r3
+ 305              	.LVL9:
+ 393:Inc/queue.h   ****         if (next_tail == buff->size)
+ 306              		.loc 2 393 9 is_stmt 1 view .LVU74
+ 307              		.loc 2 393 30 is_stmt 0 view .LVU75
+ 308 0008 9288     		ldrh	r2, [r2, #4]
+ARM GAS  /tmp/ccaiD5ge.s 			page 15
+
+
+ 309              		.loc 2 393 12 view .LVU76
+ 310 000a 9342     		cmp	r3, r2
+ 311 000c 05D0     		beq	.L23
+ 312              	.LVL10:
+ 313              	.L21:
+ 394:Inc/queue.h   ****         {
+ 395:Inc/queue.h   ****             next_tail = 0;
+ 396:Inc/queue.h   ****         }
+ 397:Inc/queue.h   **** 
+ 398:Inc/queue.h   ****         return ((next_tail == buff->head) ? TRUE : FALSE);
+ 314              		.loc 2 398 9 is_stmt 1 view .LVU77
+ 315              		.loc 2 398 35 is_stmt 0 view .LVU78
+ 316 000e 044A     		ldr	r2, .L24
+ 317 0010 5088     		ldrh	r0, [r2, #2]
+ 318              	.LVL11:
+ 319              		.loc 2 398 35 view .LVU79
+ 320              	.LBE41:
+ 321              	.LBE40:
+  83:Src/serial.c  **** }
+ 322              		.loc 1 83 1 view .LVU80
+ 323 0012 C01A     		subs	r0, r0, r3
+ 324 0014 18BF     		it	ne
+ 325 0016 0120     		movne	r0, #1
+ 326 0018 7047     		bx	lr
+ 327              	.LVL12:
+ 328              	.L23:
+ 329              	.LBB43:
+ 330              	.LBB42:
+ 395:Inc/queue.h   ****         }
+ 331              		.loc 2 395 23 view .LVU81
+ 332 001a 0023     		movs	r3, #0
+ 333              	.LVL13:
+ 395:Inc/queue.h   ****         }
+ 334              		.loc 2 395 23 view .LVU82
+ 335 001c F7E7     		b	.L21
+ 336              	.L25:
+ 337 001e 00BF     		.align	2
+ 338              	.L24:
+ 339 0020 00000000 		.word	.LANCHOR3
+ 340              	.LBE42:
+ 341              	.LBE43:
+ 342              		.cfi_endproc
+ 343              	.LFE90:
+ 345              		.section	.text.Serial_TxIdle,"ax",%progbits
+ 346              		.align	1
+ 347              		.global	Serial_TxIdle
+ 348              		.syntax unified
+ 349              		.thumb
+ 350              		.thumb_func
+ 351              		.fpu softvfp
+ 353              	Serial_TxIdle:
+ 354              	.LFB91:
+  84:Src/serial.c  **** 
+  85:Src/serial.c  **** Bool_t Serial_TxIdle(void)
+  86:Src/serial.c  **** {
+ 355              		.loc 1 86 1 is_stmt 1 view -0
+ 356              		.cfi_startproc
+ARM GAS  /tmp/ccaiD5ge.s 			page 16
+
+
+ 357              		@ args = 0, pretend = 0, frame = 0
+ 358              		@ frame_needed = 0, uses_anonymous_args = 0
+ 359              		@ link register save eliminated.
+  87:Src/serial.c  ****     return (Queue_IsEmpty(&TxBuffer) && !TxActive);
+ 360              		.loc 1 87 5 view .LVU84
+ 361              	.LVL14:
+ 362              	.LBB44:
+ 363              	.LBI44:
+ 378:Inc/queue.h   ****     {
+ 364              		.loc 2 378 26 view .LVU85
+ 365              	.LBB45:
+ 380:Inc/queue.h   ****     }
+ 366              		.loc 2 380 9 view .LVU86
+ 380:Inc/queue.h   ****     }
+ 367              		.loc 2 380 22 is_stmt 0 view .LVU87
+ 368 0000 064B     		ldr	r3, .L31
+ 369 0002 1A88     		ldrh	r2, [r3]
+ 380:Inc/queue.h   ****     }
+ 370              		.loc 2 380 36 view .LVU88
+ 371 0004 5B88     		ldrh	r3, [r3, #2]
+ 372              	.LVL15:
+ 380:Inc/queue.h   ****     }
+ 373              		.loc 2 380 36 view .LVU89
+ 374              	.LBE45:
+ 375              	.LBE44:
+ 376              		.loc 1 87 38 view .LVU90
+ 377 0006 9A42     		cmp	r2, r3
+ 378 0008 01D0     		beq	.L30
+ 379 000a 0020     		movs	r0, #0
+ 380 000c 7047     		bx	lr
+ 381              	.L30:
+ 382              		.loc 1 87 41 discriminator 1 view .LVU91
+ 383 000e 044B     		ldr	r3, .L31+4
+ 384 0010 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 385              		.loc 1 87 38 discriminator 1 view .LVU92
+ 386 0012 0BB1     		cbz	r3, .L29
+ 387              		.loc 1 87 38 view .LVU93
+ 388 0014 0020     		movs	r0, #0
+ 389 0016 7047     		bx	lr
+ 390              	.L29:
+ 391 0018 0120     		movs	r0, #1
+  88:Src/serial.c  **** }
+ 392              		.loc 1 88 1 view .LVU94
+ 393 001a 7047     		bx	lr
+ 394              	.L32:
+ 395              		.align	2
+ 396              	.L31:
+ 397 001c 00000000 		.word	.LANCHOR3
+ 398 0020 00000000 		.word	.LANCHOR6
+ 399              		.cfi_endproc
+ 400              	.LFE91:
+ 402              		.section	.text.Serial_Transmit,"ax",%progbits
+ 403              		.align	1
+ 404              		.global	Serial_Transmit
+ 405              		.syntax unified
+ 406              		.thumb
+ 407              		.thumb_func
+ARM GAS  /tmp/ccaiD5ge.s 			page 17
+
+
+ 408              		.fpu softvfp
+ 410              	Serial_Transmit:
+ 411              	.LVL16:
+ 412              	.LFB92:
+  89:Src/serial.c  **** 
+  90:Src/serial.c  **** void Serial_Transmit(uint8_t *buff, uint16_t length)
+  91:Src/serial.c  **** {
+ 413              		.loc 1 91 1 is_stmt 1 view -0
+ 414              		.cfi_startproc
+ 415              		@ args = 0, pretend = 0, frame = 0
+ 416              		@ frame_needed = 0, uses_anonymous_args = 0
+ 417              		.loc 1 91 1 is_stmt 0 view .LVU96
+ 418 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 419              	.LCFI2:
+ 420              		.cfi_def_cfa_offset 24
+ 421              		.cfi_offset 3, -24
+ 422              		.cfi_offset 4, -20
+ 423              		.cfi_offset 5, -16
+ 424              		.cfi_offset 6, -12
+ 425              		.cfi_offset 7, -8
+ 426              		.cfi_offset 14, -4
+  92:Src/serial.c  ****     // Enqueue data to the buffer.
+  93:Src/serial.c  ****     Queue_EnqueueArr(&TxBuffer, buff, length);
+ 427              		.loc 1 93 5 is_stmt 1 view .LVU97
+ 428              	.LVL17:
+ 429              	.LBB46:
+ 430              	.LBI46:
+  81:Inc/queue.h   ****     {
+ 431              		.loc 2 81 24 view .LVU98
+ 432              	.LBB47:
+  83:Inc/queue.h   **** 
+ 433              		.loc 2 83 9 view .LVU99
+  83:Inc/queue.h   **** 
+ 434              		.loc 2 83 18 is_stmt 0 view .LVU100
+ 435 0002 1A4B     		ldr	r3, .L46
+ 436 0004 1C88     		ldrh	r4, [r3]
+ 437              	.LVL18:
+  85:Inc/queue.h   ****         {
+ 438              		.loc 2 85 9 is_stmt 1 view .LVU101
+ 439              	.LBB48:
+  85:Inc/queue.h   ****         {
+ 440              		.loc 2 85 14 view .LVU102
+  85:Inc/queue.h   ****         {
+ 441              		.loc 2 85 23 is_stmt 0 view .LVU103
+ 442 0006 0023     		movs	r3, #0
+ 443 0008 02E0     		b	.L34
+ 444              	.LVL19:
+ 445              	.L41:
+  90:Inc/queue.h   ****             }
+ 446              		.loc 2 90 24 view .LVU104
+ 447 000a 0024     		movs	r4, #0
+ 448              	.L35:
+ 449              	.LVL20:
+  85:Inc/queue.h   ****         {
+ 450              		.loc 2 85 47 view .LVU105
+ 451 000c 0133     		adds	r3, r3, #1
+ 452              	.LVL21:
+ARM GAS  /tmp/ccaiD5ge.s 			page 18
+
+
+  85:Inc/queue.h   ****         {
+ 453              		.loc 2 85 47 view .LVU106
+ 454 000e 9BB2     		uxth	r3, r3
+ 455              	.LVL22:
+ 456              	.L34:
+  85:Inc/queue.h   ****         {
+ 457              		.loc 2 85 9 view .LVU107
+ 458 0010 9942     		cmp	r1, r3
+ 459 0012 0AD9     		bls	.L44
+  87:Inc/queue.h   ****             if (__tail == buff->size)
+ 460              		.loc 2 87 13 is_stmt 1 view .LVU108
+  87:Inc/queue.h   ****             if (__tail == buff->size)
+ 461              		.loc 2 87 17 is_stmt 0 view .LVU109
+ 462 0014 154D     		ldr	r5, .L46
+ 463 0016 AE68     		ldr	r6, [r5, #8]
+  87:Inc/queue.h   ****             if (__tail == buff->size)
+ 464              		.loc 2 87 36 view .LVU110
+ 465 0018 621C     		adds	r2, r4, #1
+ 466 001a 92B2     		uxth	r2, r2
+ 467              	.LVL23:
+  87:Inc/queue.h   ****             if (__tail == buff->size)
+ 468              		.loc 2 87 46 view .LVU111
+ 469 001c C75C     		ldrb	r7, [r0, r3]	@ zero_extendqisi2
+  87:Inc/queue.h   ****             if (__tail == buff->size)
+ 470              		.loc 2 87 40 view .LVU112
+ 471 001e 3755     		strb	r7, [r6, r4]
+  88:Inc/queue.h   ****             {
+ 472              		.loc 2 88 13 is_stmt 1 view .LVU113
+  88:Inc/queue.h   ****             {
+ 473              		.loc 2 88 31 is_stmt 0 view .LVU114
+ 474 0020 AC88     		ldrh	r4, [r5, #4]
+  88:Inc/queue.h   ****             {
+ 475              		.loc 2 88 16 view .LVU115
+ 476 0022 A242     		cmp	r2, r4
+ 477 0024 F1D0     		beq	.L41
+  87:Inc/queue.h   ****             if (__tail == buff->size)
+ 478              		.loc 2 87 36 view .LVU116
+ 479 0026 1446     		mov	r4, r2
+ 480 0028 F0E7     		b	.L35
+ 481              	.LVL24:
+ 482              	.L44:
+  87:Inc/queue.h   ****             if (__tail == buff->size)
+ 483              		.loc 2 87 36 view .LVU117
+ 484              	.LBE48:
+  94:Inc/queue.h   ****     }
+ 485              		.loc 2 94 9 is_stmt 1 view .LVU118
+  94:Inc/queue.h   ****     }
+ 486              		.loc 2 94 20 is_stmt 0 view .LVU119
+ 487 002a 104B     		ldr	r3, .L46
+ 488              	.LVL25:
+  94:Inc/queue.h   ****     }
+ 489              		.loc 2 94 20 view .LVU120
+ 490 002c 1C80     		strh	r4, [r3]	@ movhi
+ 491              	.LVL26:
+  94:Inc/queue.h   ****     }
+ 492              		.loc 2 94 20 view .LVU121
+ 493              	.LBE47:
+ARM GAS  /tmp/ccaiD5ge.s 			page 19
+
+
+ 494              	.LBE46:
+  94:Src/serial.c  **** 
+  95:Src/serial.c  ****     // Start transmision if it wasn't active.
+  96:Src/serial.c  ****     if (!TxActive && !Queue_IsEmpty(&TxBuffer))
+ 495              		.loc 1 96 5 is_stmt 1 view .LVU122
+ 496              		.loc 1 96 9 is_stmt 0 view .LVU123
+ 497 002e 104B     		ldr	r3, .L46+4
+ 498 0030 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 499              		.loc 1 96 8 view .LVU124
+ 500 0032 D3B9     		cbnz	r3, .L33
+ 501              	.LVL27:
+ 502              	.LBB49:
+ 503              	.LBI49:
+ 378:Inc/queue.h   ****     {
+ 504              		.loc 2 378 26 is_stmt 1 view .LVU125
+ 505              	.LBB50:
+ 380:Inc/queue.h   ****     }
+ 506              		.loc 2 380 9 view .LVU126
+ 380:Inc/queue.h   ****     }
+ 507              		.loc 2 380 36 is_stmt 0 view .LVU127
+ 508 0034 0D4B     		ldr	r3, .L46
+ 509 0036 5A88     		ldrh	r2, [r3, #2]
+ 510              	.LVL28:
+ 380:Inc/queue.h   ****     }
+ 511              		.loc 2 380 36 view .LVU128
+ 512              	.LBE50:
+ 513              	.LBE49:
+ 514              		.loc 1 96 19 view .LVU129
+ 515 0038 9442     		cmp	r4, r2
+ 516 003a 16D0     		beq	.L33
+  97:Src/serial.c  ****     {
+  98:Src/serial.c  ****         TxReg = Queue_Dequeue(&TxBuffer);
+ 517              		.loc 1 98 9 is_stmt 1 view .LVU130
+ 518              	.LVL29:
+ 519              	.LBB51:
+ 520              	.LBI51:
+ 104:Inc/queue.h   ****     {
+ 521              		.loc 2 104 27 view .LVU131
+ 522              	.LBB52:
+ 106:Inc/queue.h   **** 
+ 523              		.loc 2 106 9 view .LVU132
+ 109:Inc/queue.h   ****         if (__head == buff->size)
+ 524              		.loc 2 109 9 view .LVU133
+ 109:Inc/queue.h   ****         if (__head == buff->size)
+ 525              		.loc 2 109 31 is_stmt 0 view .LVU134
+ 526 003c 1946     		mov	r1, r3
+ 527              	.LVL30:
+ 109:Inc/queue.h   ****         if (__head == buff->size)
+ 528              		.loc 2 109 31 view .LVU135
+ 529 003e 9868     		ldr	r0, [r3, #8]
+ 530              	.LVL31:
+ 109:Inc/queue.h   ****         if (__head == buff->size)
+ 531              		.loc 2 109 50 view .LVU136
+ 532 0040 531C     		adds	r3, r2, #1
+ 533 0042 9BB2     		uxth	r3, r3
+ 534              	.LVL32:
+ 109:Inc/queue.h   ****         if (__head == buff->size)
+ARM GAS  /tmp/ccaiD5ge.s 			page 20
+
+
+ 535              		.loc 2 109 17 view .LVU137
+ 536 0044 825C     		ldrb	r2, [r0, r2]	@ zero_extendqisi2
+ 537              	.LVL33:
+ 110:Inc/queue.h   ****         {
+ 538              		.loc 2 110 9 is_stmt 1 view .LVU138
+ 110:Inc/queue.h   ****         {
+ 539              		.loc 2 110 27 is_stmt 0 view .LVU139
+ 540 0046 8988     		ldrh	r1, [r1, #4]
+ 110:Inc/queue.h   ****         {
+ 541              		.loc 2 110 12 view .LVU140
+ 542 0048 8B42     		cmp	r3, r1
+ 543 004a 09D0     		beq	.L45
+ 544              	.LVL34:
+ 545              	.L38:
+ 115:Inc/queue.h   **** 
+ 546              		.loc 2 115 9 is_stmt 1 view .LVU141
+ 115:Inc/queue.h   **** 
+ 547              		.loc 2 115 20 is_stmt 0 view .LVU142
+ 548 004c 0749     		ldr	r1, .L46
+ 549 004e 4B80     		strh	r3, [r1, #2]	@ movhi
+ 117:Inc/queue.h   ****     }
+ 550              		.loc 2 117 9 is_stmt 1 view .LVU143
+ 551              	.LVL35:
+ 117:Inc/queue.h   ****     }
+ 552              		.loc 2 117 9 is_stmt 0 view .LVU144
+ 553              	.LBE52:
+ 554              	.LBE51:
+ 555              		.loc 1 98 15 view .LVU145
+ 556 0050 0849     		ldr	r1, .L46+8
+ 557 0052 0A70     		strb	r2, [r1]
+  99:Src/serial.c  **** 
+ 100:Src/serial.c  ****         if (HAL_UART_Transmit_IT(&huart1, &TxReg, sizeof(TxReg)) != HAL_OK)
+ 558              		.loc 1 100 9 is_stmt 1 view .LVU146
+ 559              		.loc 1 100 13 is_stmt 0 view .LVU147
+ 560 0054 0122     		movs	r2, #1
+ 561 0056 0848     		ldr	r0, .L46+12
+ 562 0058 FFF7FEFF 		bl	HAL_UART_Transmit_IT
+ 563              	.LVL36:
+ 564              		.loc 1 100 12 view .LVU148
+ 565 005c 10B1     		cbz	r0, .L39
+ 566              	.L40:
+ 101:Src/serial.c  ****         {
+ 102:Src/serial.c  ****             while (TRUE)
+ 567              		.loc 1 102 13 is_stmt 1 discriminator 1 view .LVU149
+ 103:Src/serial.c  ****                 ;
+ 568              		.loc 1 103 17 discriminator 1 view .LVU150
+ 569 005e FEE7     		b	.L40
+ 570              	.LVL37:
+ 571              	.L45:
+ 572              	.LBB54:
+ 573              	.LBB53:
+ 112:Inc/queue.h   ****         }
+ 574              		.loc 2 112 20 is_stmt 0 view .LVU151
+ 575 0060 0023     		movs	r3, #0
+ 576              	.LVL38:
+ 112:Inc/queue.h   ****         }
+ 577              		.loc 2 112 20 view .LVU152
+ARM GAS  /tmp/ccaiD5ge.s 			page 21
+
+
+ 578 0062 F3E7     		b	.L38
+ 579              	.LVL39:
+ 580              	.L39:
+ 112:Inc/queue.h   ****         }
+ 581              		.loc 2 112 20 view .LVU153
+ 582              	.LBE53:
+ 583              	.LBE54:
+ 104:Src/serial.c  ****         }
+ 105:Src/serial.c  **** 
+ 106:Src/serial.c  ****         TxActive = TRUE;
+ 584              		.loc 1 106 9 is_stmt 1 view .LVU154
+ 585              		.loc 1 106 18 is_stmt 0 view .LVU155
+ 586 0064 024B     		ldr	r3, .L46+4
+ 587 0066 0122     		movs	r2, #1
+ 588 0068 1A70     		strb	r2, [r3]
+ 589              	.L33:
+ 107:Src/serial.c  ****     }
+ 108:Src/serial.c  **** }
+ 590              		.loc 1 108 1 view .LVU156
+ 591 006a F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 592              	.L47:
+ 593              		.align	2
+ 594              	.L46:
+ 595 006c 00000000 		.word	.LANCHOR3
+ 596 0070 00000000 		.word	.LANCHOR6
+ 597 0074 00000000 		.word	.LANCHOR7
+ 598 0078 00000000 		.word	huart1
+ 599              		.cfi_endproc
+ 600              	.LFE92:
+ 602              		.section	.text.Serial_GetRecvData,"ax",%progbits
+ 603              		.align	1
+ 604              		.global	Serial_GetRecvData
+ 605              		.syntax unified
+ 606              		.thumb
+ 607              		.thumb_func
+ 608              		.fpu softvfp
+ 610              	Serial_GetRecvData:
+ 611              	.LVL40:
+ 612              	.LFB93:
+ 109:Src/serial.c  **** 
+ 110:Src/serial.c  **** uint16_t Serial_GetRecvData(uint8_t *buff, uint16_t maxLength)
+ 111:Src/serial.c  **** {
+ 613              		.loc 1 111 1 is_stmt 1 view -0
+ 614              		.cfi_startproc
+ 615              		@ args = 0, pretend = 0, frame = 0
+ 616              		@ frame_needed = 0, uses_anonymous_args = 0
+ 617              		@ link register save eliminated.
+ 618              		.loc 1 111 1 is_stmt 0 view .LVU158
+ 619 0000 70B4     		push	{r4, r5, r6}
+ 620              	.LCFI3:
+ 621              		.cfi_def_cfa_offset 12
+ 622              		.cfi_offset 4, -12
+ 623              		.cfi_offset 5, -8
+ 624              		.cfi_offset 6, -4
+ 112:Src/serial.c  ****     uint16_t length;
+ 625              		.loc 1 112 5 is_stmt 1 view .LVU159
+ 113:Src/serial.c  **** 
+ARM GAS  /tmp/ccaiD5ge.s 			page 22
+
+
+ 114:Src/serial.c  ****     // Determine length of the read.
+ 115:Src/serial.c  ****     length = Queue_GetElementCount(&RxBuffer);
+ 626              		.loc 1 115 5 view .LVU160
+ 627              	.LVL41:
+ 628              	.LBB55:
+ 629              	.LBI55:
+ 150:Inc/queue.h   ****     {
+ 630              		.loc 2 150 28 view .LVU161
+ 631              	.LBB56:
+ 152:Inc/queue.h   ****         if (elements < 0)
+ 632              		.loc 2 152 9 view .LVU162
+ 152:Inc/queue.h   ****         if (elements < 0)
+ 633              		.loc 2 152 32 is_stmt 0 view .LVU163
+ 634 0002 114A     		ldr	r2, .L57
+ 635 0004 1388     		ldrh	r3, [r2]
+ 152:Inc/queue.h   ****         if (elements < 0)
+ 636              		.loc 2 152 45 view .LVU164
+ 637 0006 5488     		ldrh	r4, [r2, #2]
+ 638              	.LVL42:
+ 153:Inc/queue.h   ****         {
+ 639              		.loc 2 153 9 is_stmt 1 view .LVU165
+ 153:Inc/queue.h   ****         {
+ 640              		.loc 2 153 12 is_stmt 0 view .LVU166
+ 641 0008 1B1B     		subs	r3, r3, r4
+ 642              	.LVL43:
+ 153:Inc/queue.h   ****         {
+ 643              		.loc 2 153 12 view .LVU167
+ 644 000a 05D4     		bmi	.L55
+ 645              	.LVL44:
+ 646              	.L49:
+ 158:Inc/queue.h   ****     }
+ 647              		.loc 2 158 9 is_stmt 1 view .LVU168
+ 158:Inc/queue.h   ****     }
+ 648              		.loc 2 158 17 is_stmt 0 view .LVU169
+ 649 000c 9BB2     		uxth	r3, r3
+ 650              	.LVL45:
+ 158:Inc/queue.h   ****     }
+ 651              		.loc 2 158 17 view .LVU170
+ 652              	.LBE56:
+ 653              	.LBE55:
+ 116:Src/serial.c  ****     length = length > maxLength ? maxLength : length;
+ 654              		.loc 1 116 5 is_stmt 1 view .LVU171
+ 655              		.loc 1 116 12 is_stmt 0 view .LVU172
+ 656 000e 9942     		cmp	r1, r3
+ 657 0010 28BF     		it	cs
+ 658 0012 1946     		movcs	r1, r3
+ 659              	.LVL46:
+ 117:Src/serial.c  **** 
+ 118:Src/serial.c  ****     // Dequeue the data from the input buffer.
+ 119:Src/serial.c  ****     Queue_DequeueArr(&RxBuffer, buff, length);
+ 660              		.loc 1 119 5 is_stmt 1 view .LVU173
+ 661              	.LBB58:
+ 662              	.LBI58:
+ 127:Inc/queue.h   ****     {
+ 663              		.loc 2 127 24 view .LVU174
+ 664              	.LBB59:
+ 129:Inc/queue.h   **** 
+ARM GAS  /tmp/ccaiD5ge.s 			page 23
+
+
+ 665              		.loc 2 129 9 view .LVU175
+ 131:Inc/queue.h   ****         {
+ 666              		.loc 2 131 9 view .LVU176
+ 667              	.LBB60:
+ 131:Inc/queue.h   ****         {
+ 668              		.loc 2 131 14 view .LVU177
+ 131:Inc/queue.h   ****         {
+ 669              		.loc 2 131 23 is_stmt 0 view .LVU178
+ 670 0014 0023     		movs	r3, #0
+ 671 0016 05E0     		b	.L50
+ 672              	.LVL47:
+ 673              	.L55:
+ 131:Inc/queue.h   ****         {
+ 674              		.loc 2 131 23 view .LVU179
+ 675              	.LBE60:
+ 676              	.LBE59:
+ 677              	.LBE58:
+ 678              	.LBB63:
+ 679              	.LBB57:
+ 155:Inc/queue.h   ****         }
+ 680              		.loc 2 155 13 is_stmt 1 view .LVU180
+ 155:Inc/queue.h   ****         }
+ 681              		.loc 2 155 29 is_stmt 0 view .LVU181
+ 682 0018 9288     		ldrh	r2, [r2, #4]
+ 155:Inc/queue.h   ****         }
+ 683              		.loc 2 155 22 view .LVU182
+ 684 001a 1344     		add	r3, r3, r2
+ 685              	.LVL48:
+ 155:Inc/queue.h   ****         }
+ 686              		.loc 2 155 22 view .LVU183
+ 687 001c F6E7     		b	.L49
+ 688              	.LVL49:
+ 689              	.L53:
+ 155:Inc/queue.h   ****         }
+ 690              		.loc 2 155 22 view .LVU184
+ 691              	.LBE57:
+ 692              	.LBE63:
+ 693              	.LBB64:
+ 694              	.LBB62:
+ 695              	.LBB61:
+ 136:Inc/queue.h   ****             }
+ 696              		.loc 2 136 24 view .LVU185
+ 697 001e 0024     		movs	r4, #0
+ 698              	.L51:
+ 699              	.LVL50:
+ 131:Inc/queue.h   ****         {
+ 700              		.loc 2 131 47 view .LVU186
+ 701 0020 0133     		adds	r3, r3, #1
+ 702              	.LVL51:
+ 131:Inc/queue.h   ****         {
+ 703              		.loc 2 131 47 view .LVU187
+ 704 0022 9BB2     		uxth	r3, r3
+ 705              	.LVL52:
+ 706              	.L50:
+ 131:Inc/queue.h   ****         {
+ 707              		.loc 2 131 9 view .LVU188
+ 708 0024 9942     		cmp	r1, r3
+ARM GAS  /tmp/ccaiD5ge.s 			page 24
+
+
+ 709 0026 0AD9     		bls	.L56
+ 133:Inc/queue.h   ****             if (__head == buff->size)
+ 710              		.loc 2 133 13 is_stmt 1 view .LVU189
+ 133:Inc/queue.h   ****             if (__head == buff->size)
+ 711              		.loc 2 133 27 is_stmt 0 view .LVU190
+ 712 0028 074D     		ldr	r5, .L57
+ 713 002a AE68     		ldr	r6, [r5, #8]
+ 133:Inc/queue.h   ****             if (__head == buff->size)
+ 714              		.loc 2 133 46 view .LVU191
+ 715 002c 621C     		adds	r2, r4, #1
+ 716 002e 92B2     		uxth	r2, r2
+ 717              	.LVL53:
+ 133:Inc/queue.h   ****             if (__head == buff->size)
+ 718              		.loc 2 133 39 view .LVU192
+ 719 0030 345D     		ldrb	r4, [r6, r4]	@ zero_extendqisi2
+ 133:Inc/queue.h   ****             if (__head == buff->size)
+ 720              		.loc 2 133 21 view .LVU193
+ 721 0032 C454     		strb	r4, [r0, r3]
+ 134:Inc/queue.h   ****             {
+ 722              		.loc 2 134 13 is_stmt 1 view .LVU194
+ 134:Inc/queue.h   ****             {
+ 723              		.loc 2 134 31 is_stmt 0 view .LVU195
+ 724 0034 AC88     		ldrh	r4, [r5, #4]
+ 134:Inc/queue.h   ****             {
+ 725              		.loc 2 134 16 view .LVU196
+ 726 0036 A242     		cmp	r2, r4
+ 727 0038 F1D0     		beq	.L53
+ 133:Inc/queue.h   ****             if (__head == buff->size)
+ 728              		.loc 2 133 46 view .LVU197
+ 729 003a 1446     		mov	r4, r2
+ 730 003c F0E7     		b	.L51
+ 731              	.LVL54:
+ 732              	.L56:
+ 133:Inc/queue.h   ****             if (__head == buff->size)
+ 733              		.loc 2 133 46 view .LVU198
+ 734              	.LBE61:
+ 140:Inc/queue.h   ****     }
+ 735              		.loc 2 140 9 is_stmt 1 view .LVU199
+ 140:Inc/queue.h   ****     }
+ 736              		.loc 2 140 20 is_stmt 0 view .LVU200
+ 737 003e 024B     		ldr	r3, .L57
+ 738              	.LVL55:
+ 140:Inc/queue.h   ****     }
+ 739              		.loc 2 140 20 view .LVU201
+ 740 0040 5C80     		strh	r4, [r3, #2]	@ movhi
+ 741              	.LVL56:
+ 140:Inc/queue.h   ****     }
+ 742              		.loc 2 140 20 view .LVU202
+ 743              	.LBE62:
+ 744              	.LBE64:
+ 120:Src/serial.c  **** 
+ 121:Src/serial.c  ****     return length;
+ 745              		.loc 1 121 5 is_stmt 1 view .LVU203
+ 122:Src/serial.c  **** }
+ 746              		.loc 1 122 1 is_stmt 0 view .LVU204
+ 747 0042 0846     		mov	r0, r1
+ 748              	.LVL57:
+ARM GAS  /tmp/ccaiD5ge.s 			page 25
+
+
+ 749              		.loc 1 122 1 view .LVU205
+ 750 0044 70BC     		pop	{r4, r5, r6}
+ 751              	.LCFI4:
+ 752              		.cfi_restore 6
+ 753              		.cfi_restore 5
+ 754              		.cfi_restore 4
+ 755              		.cfi_def_cfa_offset 0
+ 756 0046 7047     		bx	lr
+ 757              	.L58:
+ 758              		.align	2
+ 759              	.L57:
+ 760 0048 00000000 		.word	.LANCHOR1
+ 761              		.cfi_endproc
+ 762              	.LFE93:
+ 764              		.section	.text.HAL_UART_RxCpltCallback,"ax",%progbits
+ 765              		.align	1
+ 766              		.global	HAL_UART_RxCpltCallback
+ 767              		.syntax unified
+ 768              		.thumb
+ 769              		.thumb_func
+ 770              		.fpu softvfp
+ 772              	HAL_UART_RxCpltCallback:
+ 773              	.LVL58:
+ 774              	.LFB94:
+ 123:Src/serial.c  **** 
+ 124:Src/serial.c  **** /* Callback functions ------------------------------------------------------*/
+ 125:Src/serial.c  **** void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+ 126:Src/serial.c  **** {
+ 775              		.loc 1 126 1 is_stmt 1 view -0
+ 776              		.cfi_startproc
+ 777              		@ args = 0, pretend = 0, frame = 0
+ 778              		@ frame_needed = 0, uses_anonymous_args = 0
+ 127:Src/serial.c  ****     if (huart == &huart1)
+ 779              		.loc 1 127 5 view .LVU207
+ 780              		.loc 1 127 8 is_stmt 0 view .LVU208
+ 781 0000 0F4B     		ldr	r3, .L71
+ 782 0002 8342     		cmp	r3, r0
+ 783 0004 00D0     		beq	.L69
+ 784              	.L66:
+ 785 0006 7047     		bx	lr
+ 786              	.L69:
+ 128:Src/serial.c  ****     {
+ 129:Src/serial.c  ****         // Guard for invalid operations.
+ 130:Src/serial.c  ****         if (Status != OPERATING)
+ 787              		.loc 1 130 9 is_stmt 1 view .LVU209
+ 788              		.loc 1 130 20 is_stmt 0 view .LVU210
+ 789 0008 0E4B     		ldr	r3, .L71+4
+ 790 000a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 791              		.loc 1 130 12 view .LVU211
+ 792 000c 022B     		cmp	r3, #2
+ 793 000e FAD1     		bne	.L66
+ 126:Src/serial.c  ****     if (huart == &huart1)
+ 794              		.loc 1 126 1 view .LVU212
+ 795 0010 10B5     		push	{r4, lr}
+ 796              	.LCFI5:
+ 797              		.cfi_def_cfa_offset 8
+ 798              		.cfi_offset 4, -8
+ARM GAS  /tmp/ccaiD5ge.s 			page 26
+
+
+ 799              		.cfi_offset 14, -4
+ 131:Src/serial.c  ****         {
+ 132:Src/serial.c  ****             return;
+ 133:Src/serial.c  ****         }
+ 134:Src/serial.c  **** 
+ 135:Src/serial.c  ****         // Restart reception interrupt.
+ 136:Src/serial.c  ****         if (HAL_UART_Receive_IT(&huart1, &RxReg, sizeof(RxReg)) != HAL_OK)
+ 800              		.loc 1 136 9 is_stmt 1 view .LVU213
+ 801              		.loc 1 136 13 is_stmt 0 view .LVU214
+ 802 0012 0122     		movs	r2, #1
+ 803 0014 0C49     		ldr	r1, .L71+8
+ 804 0016 0A48     		ldr	r0, .L71
+ 805              	.LVL59:
+ 806              		.loc 1 136 13 view .LVU215
+ 807 0018 FFF7FEFF 		bl	HAL_UART_Receive_IT
+ 808              	.LVL60:
+ 809              		.loc 1 136 12 view .LVU216
+ 810 001c 00B1     		cbz	r0, .L61
+ 811              	.L62:
+ 137:Src/serial.c  ****         {
+ 138:Src/serial.c  ****             while (TRUE)
+ 812              		.loc 1 138 13 is_stmt 1 discriminator 1 view .LVU217
+ 139:Src/serial.c  ****                 ;
+ 813              		.loc 1 139 17 discriminator 1 view .LVU218
+ 814 001e FEE7     		b	.L62
+ 815              	.L61:
+ 140:Src/serial.c  ****         }
+ 141:Src/serial.c  **** 
+ 142:Src/serial.c  ****         // Enqueue received data.
+ 143:Src/serial.c  ****         Queue_Enqueue(&RxBuffer, RxReg);
+ 816              		.loc 1 143 9 view .LVU219
+ 817 0020 094B     		ldr	r3, .L71+8
+ 818 0022 1C78     		ldrb	r4, [r3]	@ zero_extendqisi2
+ 819              	.LVL61:
+ 820              	.LBB65:
+ 821              	.LBI65:
+  61:Inc/queue.h   ****     {
+ 822              		.loc 2 61 24 view .LVU220
+ 823              	.LBB66:
+  63:Inc/queue.h   **** 
+ 824              		.loc 2 63 9 view .LVU221
+  63:Inc/queue.h   **** 
+ 825              		.loc 2 63 18 is_stmt 0 view .LVU222
+ 826 0024 094A     		ldr	r2, .L71+12
+ 827 0026 1188     		ldrh	r1, [r2]
+ 828              	.LVL62:
+  66:Inc/queue.h   ****         if (__tail == buff->size)
+ 829              		.loc 2 66 9 is_stmt 1 view .LVU223
+  66:Inc/queue.h   ****         if (__tail == buff->size)
+ 830              		.loc 2 66 13 is_stmt 0 view .LVU224
+ 831 0028 9068     		ldr	r0, [r2, #8]
+  66:Inc/queue.h   ****         if (__tail == buff->size)
+ 832              		.loc 2 66 32 view .LVU225
+ 833 002a 4B1C     		adds	r3, r1, #1
+ 834 002c 9BB2     		uxth	r3, r3
+ 835              	.LVL63:
+  66:Inc/queue.h   ****         if (__tail == buff->size)
+ARM GAS  /tmp/ccaiD5ge.s 			page 27
+
+
+ 836              		.loc 2 66 36 view .LVU226
+ 837 002e 4454     		strb	r4, [r0, r1]
+  67:Inc/queue.h   ****         {
+ 838              		.loc 2 67 9 is_stmt 1 view .LVU227
+  67:Inc/queue.h   ****         {
+ 839              		.loc 2 67 27 is_stmt 0 view .LVU228
+ 840 0030 9288     		ldrh	r2, [r2, #4]
+  67:Inc/queue.h   ****         {
+ 841              		.loc 2 67 12 view .LVU229
+ 842 0032 9342     		cmp	r3, r2
+ 843 0034 02D0     		beq	.L70
+ 844              	.LVL64:
+ 845              	.L63:
+  72:Inc/queue.h   ****     }
+ 846              		.loc 2 72 9 is_stmt 1 view .LVU230
+  72:Inc/queue.h   ****     }
+ 847              		.loc 2 72 20 is_stmt 0 view .LVU231
+ 848 0036 054A     		ldr	r2, .L71+12
+ 849 0038 1380     		strh	r3, [r2]	@ movhi
+ 850              	.LBE66:
+ 851              	.LBE65:
+ 144:Src/serial.c  ****     }
+ 145:Src/serial.c  **** }
+ 852              		.loc 1 145 1 view .LVU232
+ 853 003a 10BD     		pop	{r4, pc}
+ 854              	.LVL65:
+ 855              	.L70:
+ 856              	.LBB68:
+ 857              	.LBB67:
+  69:Inc/queue.h   ****         }
+ 858              		.loc 2 69 20 view .LVU233
+ 859 003c 0023     		movs	r3, #0
+ 860              	.LVL66:
+  69:Inc/queue.h   ****         }
+ 861              		.loc 2 69 20 view .LVU234
+ 862 003e FAE7     		b	.L63
+ 863              	.L72:
+ 864              		.align	2
+ 865              	.L71:
+ 866 0040 00000000 		.word	huart1
+ 867 0044 00000000 		.word	.LANCHOR0
+ 868 0048 00000000 		.word	.LANCHOR5
+ 869 004c 00000000 		.word	.LANCHOR1
+ 870              	.LBE67:
+ 871              	.LBE68:
+ 872              		.cfi_endproc
+ 873              	.LFE94:
+ 875              		.section	.text.HAL_UART_TxCpltCallback,"ax",%progbits
+ 876              		.align	1
+ 877              		.global	HAL_UART_TxCpltCallback
+ 878              		.syntax unified
+ 879              		.thumb
+ 880              		.thumb_func
+ 881              		.fpu softvfp
+ 883              	HAL_UART_TxCpltCallback:
+ 884              	.LVL67:
+ 885              	.LFB95:
+ARM GAS  /tmp/ccaiD5ge.s 			page 28
+
+
+ 146:Src/serial.c  **** 
+ 147:Src/serial.c  **** void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+ 148:Src/serial.c  **** {
+ 886              		.loc 1 148 1 is_stmt 1 view -0
+ 887              		.cfi_startproc
+ 888              		@ args = 0, pretend = 0, frame = 0
+ 889              		@ frame_needed = 0, uses_anonymous_args = 0
+ 890              		.loc 1 148 1 is_stmt 0 view .LVU236
+ 891 0000 08B5     		push	{r3, lr}
+ 892              	.LCFI6:
+ 893              		.cfi_def_cfa_offset 8
+ 894              		.cfi_offset 3, -8
+ 895              		.cfi_offset 14, -4
+ 149:Src/serial.c  ****     if (huart == &huart1)
+ 896              		.loc 1 149 5 is_stmt 1 view .LVU237
+ 897              		.loc 1 149 8 is_stmt 0 view .LVU238
+ 898 0002 114B     		ldr	r3, .L81
+ 899 0004 8342     		cmp	r3, r0
+ 900 0006 00D0     		beq	.L79
+ 901              	.LVL68:
+ 902              	.L73:
+ 150:Src/serial.c  ****     {
+ 151:Src/serial.c  ****         // Guard for invalid operations.
+ 152:Src/serial.c  ****         if (Status != OPERATING)
+ 153:Src/serial.c  ****         {
+ 154:Src/serial.c  ****             return;
+ 155:Src/serial.c  ****         }
+ 156:Src/serial.c  **** 
+ 157:Src/serial.c  ****         // If there are pending data on the TxBuffer; transmit it.
+ 158:Src/serial.c  ****         if (!Queue_IsEmpty(&TxBuffer))
+ 159:Src/serial.c  ****         {
+ 160:Src/serial.c  ****             TxReg = Queue_Dequeue(&TxBuffer);
+ 161:Src/serial.c  **** 
+ 162:Src/serial.c  ****             // Restart transmission interrupt.
+ 163:Src/serial.c  ****             if (HAL_UART_Transmit_IT(&huart1, &RxReg, sizeof(RxReg)) != HAL_OK)
+ 164:Src/serial.c  ****             {
+ 165:Src/serial.c  ****                 while (TRUE)
+ 166:Src/serial.c  ****                     ;
+ 167:Src/serial.c  ****             }
+ 168:Src/serial.c  ****         }
+ 169:Src/serial.c  ****     }
+ 170:Src/serial.c  **** }...
+ 903              		.loc 1 170 1 view .LVU239
+ 904 0008 08BD     		pop	{r3, pc}
+ 905              	.LVL69:
+ 906              	.L79:
+ 152:Src/serial.c  ****         if (Status != OPERATING)
+ 907              		.loc 1 152 9 is_stmt 1 view .LVU240
+ 152:Src/serial.c  ****         if (Status != OPERATING)
+ 908              		.loc 1 152 20 is_stmt 0 view .LVU241
+ 909 000a 104B     		ldr	r3, .L81+4
+ 910 000c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 152:Src/serial.c  ****         if (Status != OPERATING)
+ 911              		.loc 1 152 12 view .LVU242
+ 912 000e 022B     		cmp	r3, #2
+ 913 0010 FAD1     		bne	.L73
+ 158:Src/serial.c  ****         if (!Queue_IsEmpty(&TxBuffer))
+ARM GAS  /tmp/ccaiD5ge.s 			page 29
+
+
+ 914              		.loc 1 158 9 is_stmt 1 view .LVU243
+ 915              	.LVL70:
+ 916              	.LBB69:
+ 917              	.LBI69:
+ 378:Inc/queue.h   ****     {
+ 918              		.loc 2 378 26 view .LVU244
+ 919              	.LBB70:
+ 380:Inc/queue.h   ****     }
+ 920              		.loc 2 380 9 view .LVU245
+ 380:Inc/queue.h   ****     }
+ 921              		.loc 2 380 22 is_stmt 0 view .LVU246
+ 922 0012 0F4B     		ldr	r3, .L81+8
+ 923 0014 1988     		ldrh	r1, [r3]
+ 380:Inc/queue.h   ****     }
+ 924              		.loc 2 380 36 view .LVU247
+ 925 0016 5A88     		ldrh	r2, [r3, #2]
+ 926              	.LVL71:
+ 380:Inc/queue.h   ****     }
+ 927              		.loc 2 380 36 view .LVU248
+ 928              	.LBE70:
+ 929              	.LBE69:
+ 158:Src/serial.c  ****         if (!Queue_IsEmpty(&TxBuffer))
+ 930              		.loc 1 158 12 view .LVU249
+ 931 0018 9142     		cmp	r1, r2
+ 932 001a F5D0     		beq	.L73
+ 160:Src/serial.c  ****             TxReg = Queue_Dequeue(&TxBuffer);
+ 933              		.loc 1 160 13 is_stmt 1 view .LVU250
+ 934              	.LVL72:
+ 935              	.LBB71:
+ 936              	.LBI71:
+ 104:Inc/queue.h   ****     {
+ 937              		.loc 2 104 27 view .LVU251
+ 938              	.LBB72:
+ 106:Inc/queue.h   **** 
+ 939              		.loc 2 106 9 view .LVU252
+ 109:Inc/queue.h   ****         if (__head == buff->size)
+ 940              		.loc 2 109 9 view .LVU253
+ 109:Inc/queue.h   ****         if (__head == buff->size)
+ 941              		.loc 2 109 31 is_stmt 0 view .LVU254
+ 942 001c 1946     		mov	r1, r3
+ 943 001e 9868     		ldr	r0, [r3, #8]
+ 944              	.LVL73:
+ 109:Inc/queue.h   ****         if (__head == buff->size)
+ 945              		.loc 2 109 50 view .LVU255
+ 946 0020 531C     		adds	r3, r2, #1
+ 947 0022 9BB2     		uxth	r3, r3
+ 948              	.LVL74:
+ 109:Inc/queue.h   ****         if (__head == buff->size)
+ 949              		.loc 2 109 17 view .LVU256
+ 950 0024 825C     		ldrb	r2, [r0, r2]	@ zero_extendqisi2
+ 951              	.LVL75:
+ 110:Inc/queue.h   ****         {
+ 952              		.loc 2 110 9 is_stmt 1 view .LVU257
+ 110:Inc/queue.h   ****         {
+ 953              		.loc 2 110 27 is_stmt 0 view .LVU258
+ 954 0026 8988     		ldrh	r1, [r1, #4]
+ 110:Inc/queue.h   ****         {
+ARM GAS  /tmp/ccaiD5ge.s 			page 30
+
+
+ 955              		.loc 2 110 12 view .LVU259
+ 956 0028 8B42     		cmp	r3, r1
+ 957 002a 0BD0     		beq	.L80
+ 958              	.LVL76:
+ 959              	.L75:
+ 115:Inc/queue.h   **** 
+ 960              		.loc 2 115 9 is_stmt 1 view .LVU260
+ 115:Inc/queue.h   **** 
+ 961              		.loc 2 115 20 is_stmt 0 view .LVU261
+ 962 002c 0849     		ldr	r1, .L81+8
+ 963 002e 4B80     		strh	r3, [r1, #2]	@ movhi
+ 117:Inc/queue.h   ****     }
+ 964              		.loc 2 117 9 is_stmt 1 view .LVU262
+ 965              	.LVL77:
+ 117:Inc/queue.h   ****     }
+ 966              		.loc 2 117 9 is_stmt 0 view .LVU263
+ 967              	.LBE72:
+ 968              	.LBE71:
+ 160:Src/serial.c  ****             TxReg = Queue_Dequeue(&TxBuffer);
+ 969              		.loc 1 160 19 view .LVU264
+ 970 0030 084B     		ldr	r3, .L81+12
+ 971 0032 1A70     		strb	r2, [r3]
+ 163:Src/serial.c  ****             if (HAL_UART_Transmit_IT(&huart1, &RxReg, sizeof(RxReg)) != HAL_OK)
+ 972              		.loc 1 163 13 is_stmt 1 view .LVU265
+ 163:Src/serial.c  ****             if (HAL_UART_Transmit_IT(&huart1, &RxReg, sizeof(RxReg)) != HAL_OK)
+ 973              		.loc 1 163 17 is_stmt 0 view .LVU266
+ 974 0034 0122     		movs	r2, #1
+ 975 0036 0849     		ldr	r1, .L81+16
+ 976 0038 0348     		ldr	r0, .L81
+ 977 003a FFF7FEFF 		bl	HAL_UART_Transmit_IT
+ 978              	.LVL78:
+ 163:Src/serial.c  ****             if (HAL_UART_Transmit_IT(&huart1, &RxReg, sizeof(RxReg)) != HAL_OK)
+ 979              		.loc 1 163 16 view .LVU267
+ 980 003e 0028     		cmp	r0, #0
+ 981 0040 E2D0     		beq	.L73
+ 982              	.L76:
+ 165:Src/serial.c  ****                 while (TRUE)
+ 983              		.loc 1 165 17 is_stmt 1 discriminator 1 view .LVU268
+ 166:Src/serial.c  ****                     ;
+ 984              		.loc 1 166 21 discriminator 1 view .LVU269
+ 985 0042 FEE7     		b	.L76
+ 986              	.LVL79:
+ 987              	.L80:
+ 988              	.LBB74:
+ 989              	.LBB73:
+ 112:Inc/queue.h   ****         }
+ 990              		.loc 2 112 20 is_stmt 0 view .LVU270
+ 991 0044 0023     		movs	r3, #0
+ 992              	.LVL80:
+ 112:Inc/queue.h   ****         }
+ 993              		.loc 2 112 20 view .LVU271
+ 994 0046 F1E7     		b	.L75
+ 995              	.L82:
+ 996              		.align	2
+ 997              	.L81:
+ 998 0048 00000000 		.word	huart1
+ 999 004c 00000000 		.word	.LANCHOR0
+ARM GAS  /tmp/ccaiD5ge.s 			page 31
+
+
+ 1000 0050 00000000 		.word	.LANCHOR3
+ 1001 0054 00000000 		.word	.LANCHOR7
+ 1002 0058 00000000 		.word	.LANCHOR5
+ 1003              	.LBE73:
+ 1004              	.LBE74:
+ 1005              		.cfi_endproc
+ 1006              	.LFE95:
+ 1008              		.section	.bss.RxBuffer,"aw",%nobits
+ 1009              		.align	2
+ 1010              		.set	.LANCHOR1,. + 0
+ 1013              	RxBuffer:
+ 1014 0000 00000000 		.space	12
+ 1014      00000000 
+ 1014      00000000 
+ 1015              		.section	.bss.RxBufferContainer,"aw",%nobits
+ 1016              		.align	2
+ 1017              		.set	.LANCHOR2,. + 0
+ 1020              	RxBufferContainer:
+ 1021 0000 00000000 		.space	16
+ 1021      00000000 
+ 1021      00000000 
+ 1021      00000000 
+ 1022              		.section	.bss.RxReg,"aw",%nobits
+ 1023              		.set	.LANCHOR5,. + 0
+ 1026              	RxReg:
+ 1027 0000 00       		.space	1
+ 1028              		.section	.bss.Status,"aw",%nobits
+ 1029              		.set	.LANCHOR0,. + 0
+ 1032              	Status:
+ 1033 0000 00       		.space	1
+ 1034              		.section	.bss.TxActive,"aw",%nobits
+ 1035              		.set	.LANCHOR6,. + 0
+ 1038              	TxActive:
+ 1039 0000 00       		.space	1
+ 1040              		.section	.bss.TxBuffer,"aw",%nobits
+ 1041              		.align	2
+ 1042              		.set	.LANCHOR3,. + 0
+ 1045              	TxBuffer:
+ 1046 0000 00000000 		.space	12
+ 1046      00000000 
+ 1046      00000000 
+ 1047              		.section	.bss.TxBufferContainer,"aw",%nobits
+ 1048              		.align	2
+ 1049              		.set	.LANCHOR4,. + 0
+ 1052              	TxBufferContainer:
+ 1053 0000 00000000 		.space	16
+ 1053      00000000 
+ 1053      00000000 
+ 1053      00000000 
+ 1054              		.section	.bss.TxReg,"aw",%nobits
+ 1055              		.set	.LANCHOR7,. + 0
+ 1058              	TxReg:
+ 1059 0000 00       		.space	1
+ 1060              		.text
+ 1061              	.Letext0:
+ 1062              		.file 3 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/arm-none-eabi/include/machine
+ 1063              		.file 4 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/arm-none-eabi/include/sys/_st
+ARM GAS  /tmp/ccaiD5ge.s 			page 32
+
+
+ 1064              		.file 5 "Drivers/CMSIS/Include/core_cm3.h"
+ 1065              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 1066              		.file 7 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 1067              		.file 8 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/arm-none-eabi/include/sys/loc
+ 1068              		.file 9 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/arm-none-eabi/include/sys/_ty
+ 1069              		.file 10 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/lib/gcc/arm-none-eabi/8.2.1/
+ 1070              		.file 11 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/arm-none-eabi/include/sys/re
+ 1071              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 1072              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 1073              		.file 14 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
+ 1074              		.file 15 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 1075              		.file 16 "Inc/global.h"
+ARM GAS  /tmp/ccaiD5ge.s 			page 33
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 serial.c
+     /tmp/ccaiD5ge.s:16     .text.Serial_Init:0000000000000000 $t
+     /tmp/ccaiD5ge.s:24     .text.Serial_Init:0000000000000000 Serial_Init
+     /tmp/ccaiD5ge.s:99     .text.Serial_Init:000000000000002c $d
+     /tmp/ccaiD5ge.s:108    .text.Serial_Start:0000000000000000 $t
+     /tmp/ccaiD5ge.s:115    .text.Serial_Start:0000000000000000 Serial_Start
+     /tmp/ccaiD5ge.s:199    .text.Serial_Start:0000000000000038 $d
+     /tmp/ccaiD5ge.s:209    .text.Serial_Execute:0000000000000000 $t
+     /tmp/ccaiD5ge.s:216    .text.Serial_Execute:0000000000000000 Serial_Execute
+     /tmp/ccaiD5ge.s:230    .text.Serial_Stop:0000000000000000 $t
+     /tmp/ccaiD5ge.s:237    .text.Serial_Stop:0000000000000000 Serial_Stop
+     /tmp/ccaiD5ge.s:272    .text.Serial_Stop:000000000000001c $d
+     /tmp/ccaiD5ge.s:278    .text.Serial_TxBuffAvailable:0000000000000000 $t
+     /tmp/ccaiD5ge.s:285    .text.Serial_TxBuffAvailable:0000000000000000 Serial_TxBuffAvailable
+     /tmp/ccaiD5ge.s:339    .text.Serial_TxBuffAvailable:0000000000000020 $d
+     /tmp/ccaiD5ge.s:346    .text.Serial_TxIdle:0000000000000000 $t
+     /tmp/ccaiD5ge.s:353    .text.Serial_TxIdle:0000000000000000 Serial_TxIdle
+     /tmp/ccaiD5ge.s:397    .text.Serial_TxIdle:000000000000001c $d
+     /tmp/ccaiD5ge.s:403    .text.Serial_Transmit:0000000000000000 $t
+     /tmp/ccaiD5ge.s:410    .text.Serial_Transmit:0000000000000000 Serial_Transmit
+     /tmp/ccaiD5ge.s:595    .text.Serial_Transmit:000000000000006c $d
+     /tmp/ccaiD5ge.s:603    .text.Serial_GetRecvData:0000000000000000 $t
+     /tmp/ccaiD5ge.s:610    .text.Serial_GetRecvData:0000000000000000 Serial_GetRecvData
+     /tmp/ccaiD5ge.s:760    .text.Serial_GetRecvData:0000000000000048 $d
+     /tmp/ccaiD5ge.s:765    .text.HAL_UART_RxCpltCallback:0000000000000000 $t
+     /tmp/ccaiD5ge.s:772    .text.HAL_UART_RxCpltCallback:0000000000000000 HAL_UART_RxCpltCallback
+     /tmp/ccaiD5ge.s:866    .text.HAL_UART_RxCpltCallback:0000000000000040 $d
+     /tmp/ccaiD5ge.s:876    .text.HAL_UART_TxCpltCallback:0000000000000000 $t
+     /tmp/ccaiD5ge.s:883    .text.HAL_UART_TxCpltCallback:0000000000000000 HAL_UART_TxCpltCallback
+     /tmp/ccaiD5ge.s:998    .text.HAL_UART_TxCpltCallback:0000000000000048 $d
+     /tmp/ccaiD5ge.s:1009   .bss.RxBuffer:0000000000000000 $d
+     /tmp/ccaiD5ge.s:1013   .bss.RxBuffer:0000000000000000 RxBuffer
+     /tmp/ccaiD5ge.s:1016   .bss.RxBufferContainer:0000000000000000 $d
+     /tmp/ccaiD5ge.s:1020   .bss.RxBufferContainer:0000000000000000 RxBufferContainer
+     /tmp/ccaiD5ge.s:1026   .bss.RxReg:0000000000000000 RxReg
+     /tmp/ccaiD5ge.s:1027   .bss.RxReg:0000000000000000 $d
+     /tmp/ccaiD5ge.s:1032   .bss.Status:0000000000000000 Status
+     /tmp/ccaiD5ge.s:1033   .bss.Status:0000000000000000 $d
+     /tmp/ccaiD5ge.s:1038   .bss.TxActive:0000000000000000 TxActive
+     /tmp/ccaiD5ge.s:1039   .bss.TxActive:0000000000000000 $d
+     /tmp/ccaiD5ge.s:1041   .bss.TxBuffer:0000000000000000 $d
+     /tmp/ccaiD5ge.s:1045   .bss.TxBuffer:0000000000000000 TxBuffer
+     /tmp/ccaiD5ge.s:1048   .bss.TxBufferContainer:0000000000000000 $d
+     /tmp/ccaiD5ge.s:1052   .bss.TxBufferContainer:0000000000000000 TxBufferContainer
+     /tmp/ccaiD5ge.s:1058   .bss.TxReg:0000000000000000 TxReg
+     /tmp/ccaiD5ge.s:1059   .bss.TxReg:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+HAL_UART_Receive_IT
+huart1
+HAL_UART_Abort_IT
+HAL_UART_Transmit_IT

@@ -1,0 +1,105 @@
+\hypertarget{nexserial_8h}{}\doxysection{Inc/nexserial.h File Reference}
+\label{nexserial_8h}\index{Inc/nexserial.h@{Inc/nexserial.h}}
+{\ttfamily \#include \char`\"{}global.\+h\char`\"{}}\newline
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{nexserial_8h_a0a3e7218f6019b8c0041e13e29ed302f}{Serial\+\_\+\+Init}} (void)
+\begin{DoxyCompactList}\small\item\em Function to initialize the module. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexserial_8h_af14bb0bfb0b0be72d1ff77b58018fd1a}{Serial\+\_\+\+Start}} (void)
+\begin{DoxyCompactList}\small\item\em Function to start the module. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexserial_8h_aa8b5818ca61be0747d5210bf2338f0fa}{Serial\+\_\+\+Stop}} (void)
+\begin{DoxyCompactList}\small\item\em Function to stop the module. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{global_8h_aafeacc358724fc9bb80e4af135a13b04}{Bool\+\_\+t}} \mbox{\hyperlink{nexserial_8h_a54c1ed1e21f439bd5e51c69ced2a05ee}{Serial\+\_\+\+Tx\+Buff\+Available}} (void)
+\begin{DoxyCompactList}\small\item\em Returns if there are any empty space in the Tx\+Buffer. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexserial_8h_abee144c8e6c47961b4ff69784b612c14}{Serial\+\_\+\+Transmit}} (uint8\+\_\+t $\ast$buff, uint16\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Enqueues array of data to the Tx\+Buffer and starts the transmission if it\textquotesingle{}s not active. \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{nexserial_8h_a13475d5b8196eb163b406ef3c8b8388c}{Serial\+\_\+\+Get\+Recv\+Data}} (uint8\+\_\+t $\ast$buff, uint16\+\_\+t max\+Length)
+\begin{DoxyCompactList}\small\item\em Returns received data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{nexserial_8h_a13475d5b8196eb163b406ef3c8b8388c}\label{nexserial_8h_a13475d5b8196eb163b406ef3c8b8388c}} 
+\index{nexserial.h@{nexserial.h}!Serial\_GetRecvData@{Serial\_GetRecvData}}
+\index{Serial\_GetRecvData@{Serial\_GetRecvData}!nexserial.h@{nexserial.h}}
+\doxysubsubsection{\texorpdfstring{Serial\_GetRecvData()}{Serial\_GetRecvData()}}
+{\footnotesize\ttfamily uint16\+\_\+t Serial\+\_\+\+Get\+Recv\+Data (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{buff,  }\item[{uint16\+\_\+t}]{max\+Length }\end{DoxyParamCaption})}
+
+
+
+Returns received data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buff} & Pointer of the buffer which the received data will be transferred. \\
+\hline
+{\em max\+Length} & Maximum length of data to be read.\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Length} & of the read. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{nexserial_8h_a0a3e7218f6019b8c0041e13e29ed302f}\label{nexserial_8h_a0a3e7218f6019b8c0041e13e29ed302f}} 
+\index{nexserial.h@{nexserial.h}!Serial\_Init@{Serial\_Init}}
+\index{Serial\_Init@{Serial\_Init}!nexserial.h@{nexserial.h}}
+\doxysubsubsection{\texorpdfstring{Serial\_Init()}{Serial\_Init()}}
+{\footnotesize\ttfamily void Serial\+\_\+\+Init (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Function to initialize the module. 
+
+\mbox{\Hypertarget{nexserial_8h_af14bb0bfb0b0be72d1ff77b58018fd1a}\label{nexserial_8h_af14bb0bfb0b0be72d1ff77b58018fd1a}} 
+\index{nexserial.h@{nexserial.h}!Serial\_Start@{Serial\_Start}}
+\index{Serial\_Start@{Serial\_Start}!nexserial.h@{nexserial.h}}
+\doxysubsubsection{\texorpdfstring{Serial\_Start()}{Serial\_Start()}}
+{\footnotesize\ttfamily void Serial\+\_\+\+Start (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Function to start the module. 
+
+\mbox{\Hypertarget{nexserial_8h_aa8b5818ca61be0747d5210bf2338f0fa}\label{nexserial_8h_aa8b5818ca61be0747d5210bf2338f0fa}} 
+\index{nexserial.h@{nexserial.h}!Serial\_Stop@{Serial\_Stop}}
+\index{Serial\_Stop@{Serial\_Stop}!nexserial.h@{nexserial.h}}
+\doxysubsubsection{\texorpdfstring{Serial\_Stop()}{Serial\_Stop()}}
+{\footnotesize\ttfamily void Serial\+\_\+\+Stop (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Function to stop the module. 
+
+\mbox{\Hypertarget{nexserial_8h_abee144c8e6c47961b4ff69784b612c14}\label{nexserial_8h_abee144c8e6c47961b4ff69784b612c14}} 
+\index{nexserial.h@{nexserial.h}!Serial\_Transmit@{Serial\_Transmit}}
+\index{Serial\_Transmit@{Serial\_Transmit}!nexserial.h@{nexserial.h}}
+\doxysubsubsection{\texorpdfstring{Serial\_Transmit()}{Serial\_Transmit()}}
+{\footnotesize\ttfamily void Serial\+\_\+\+Transmit (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{buff,  }\item[{uint16\+\_\+t}]{length }\end{DoxyParamCaption})}
+
+
+
+Enqueues array of data to the Tx\+Buffer and starts the transmission if it\textquotesingle{}s not active. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buff} & Pointer of the array. \\
+\hline
+{\em length} & Element count of the array. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{nexserial_8h_a54c1ed1e21f439bd5e51c69ced2a05ee}\label{nexserial_8h_a54c1ed1e21f439bd5e51c69ced2a05ee}} 
+\index{nexserial.h@{nexserial.h}!Serial\_TxBuffAvailable@{Serial\_TxBuffAvailable}}
+\index{Serial\_TxBuffAvailable@{Serial\_TxBuffAvailable}!nexserial.h@{nexserial.h}}
+\doxysubsubsection{\texorpdfstring{Serial\_TxBuffAvailable()}{Serial\_TxBuffAvailable()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{global_8h_aafeacc358724fc9bb80e4af135a13b04}{Bool\+\_\+t}} Serial\+\_\+\+Tx\+Buff\+Available (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Returns if there are any empty space in the Tx\+Buffer. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em T\+R\+UE} & if there are any space; F\+A\+L\+SE if not. \\
+\hline
+\end{DoxyRetVals}

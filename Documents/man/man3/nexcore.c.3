@@ -1,0 +1,503 @@
+.TH "Src/nexcore.c" 3 "Fri Aug 14 2020" "Version 1" "NextionForSTM32" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Src/nexcore.c
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'nexcore\&.h'\fP
+.br
+\fC#include 'nexserial\&.h'\fP
+.br
+\fC#include 'utilities\&.h'\fP
+.br
+\fC#include 'queue\&.h'\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBNR_INVALID_INSTRUCTION\fP   ((uint8_t)0x00)"
+.br
+.ti -1c
+.RI "#define \fBNR_INSTRUCTION_SUCCESSFUL\fP   ((uint8_t)0x01)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_COMPONENT_ID\fP   ((uint8_t)0x02)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_PAGE_ID\fP   ((uint8_t)0x03)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_PICTURE_ID\fP   ((uint8_t)0x04)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_FONT_ID\fP   ((uint8_t)0x05)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_FILE_OPERATION\fP   ((uint8_t)0x06)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_CRC\fP   ((uint8_t)0x09)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_BAUDRATE_SETTING\fP   ((uint8_t)0x11)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_WAVEFORM_ID_OR_CHANNEL\fP   ((uint8_t)0x12)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_VARIABLE_NAME_OR_ATTIRIBUTE\fP   ((uint8_t)0x1A)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_VARIABLE_OPERATION\fP   ((uint8_t)0x1B)"
+.br
+.ti -1c
+.RI "#define \fBNR_ASSIGNMENT_FAILED_TO_ASSIGN\fP   ((uint8_t)0x1C)"
+.br
+.ti -1c
+.RI "#define \fBNR_EEPROM_OPERATION_FAILED\fP   ((uint8_t)0x1D)"
+.br
+.ti -1c
+.RI "#define \fBNR_INVALID_QUANTITY_OF_PARAMETERS\fP   ((uint8_t)0x1E)"
+.br
+.ti -1c
+.RI "#define \fBNR_IO_OPERATION_FAILED\fP   ((uint8_t)0x1F)"
+.br
+.ti -1c
+.RI "#define \fBNR_ESCAPE_CHARACTER_INVALID\fP   ((uint8_t)0x20)"
+.br
+.ti -1c
+.RI "#define \fBNR_VARIABLE_NAME_TOO_LONG\fP   ((uint8_t)0x23)"
+.br
+.ti -1c
+.RI "#define \fBNR_SERIAL_BUFFER_OVERFLOW\fP   ((uint8_t)0x24)"
+.br
+.ti -1c
+.RI "#define \fBNR_TOUCH_EVENT\fP   ((uint8_t)0x65)"
+.br
+.ti -1c
+.RI "#define \fBNR_CURRENT_PAGE_NUMBER\fP   ((uint8_t)0x66)"
+.br
+.ti -1c
+.RI "#define \fBNR_TOUCH_COORDINATE_AWAKE\fP   ((uint8_t)0x67)"
+.br
+.ti -1c
+.RI "#define \fBNR_TOUCH_COORDINATE_SLEEP\fP   ((uint8_t)0x68)"
+.br
+.ti -1c
+.RI "#define \fBNR_VARIED_STRING_DATA_ENCLOSED\fP   ((uint8_t)0x70)"
+.br
+.ti -1c
+.RI "#define \fBNR_NUMERIC_DATA_ENCLOSED\fP   ((uint8_t)0x71)"
+.br
+.ti -1c
+.RI "#define \fBNR_AUTO_ENTERED_SLEEP_MODE\fP   ((uint8_t)0x86)"
+.br
+.ti -1c
+.RI "#define \fBNR_AUTO_WAKE_FROM_SLEEP\fP   ((uint8_t)0x87)"
+.br
+.ti -1c
+.RI "#define \fBNR_NEXTION_READY\fP   ((uint8_t)0x88)"
+.br
+.ti -1c
+.RI "#define \fBNR_START_MICROSD_UPGRAGE\fP   ((uint8_t)0x89)"
+.br
+.ti -1c
+.RI "#define \fBNR_TRANSPARENT_DATA_FINISHED\fP   ((uint8_t)0xFD)"
+.br
+.ti -1c
+.RI "#define \fBNR_TRANSPARENT_DATA_READY\fP   ((uint8_t)0xFE)"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBNexcore_Init\fP (void)"
+.br
+.RI "Initializes module\&. "
+.ti -1c
+.RI "void \fBNexcore_Start\fP (void)"
+.br
+.RI "Starts the operation of the module\&. "
+.ti -1c
+.RI "void \fBNexcore_Execute\fP (void)"
+.br
+.RI "This function should be called to transfer control to this module to complete it's pending operations\&. "
+.ti -1c
+.RI "void \fBNexcore_Stop\fP (void)"
+.br
+.RI "Stops the module\&. "
+.ti -1c
+.RI "uint8_t \fBNexcore_EnqueueMsg\fP (char **chunks, uint8_t chunkCount)"
+.br
+.RI "Concats the strings given as chunks and enqueues them to the module's TxQueue\&. "
+.ti -1c
+.RI "uint8_t \fBNexcore_Get\fP (char *name, char *attribute)"
+.br
+.RI "Gets the value of a component's attribute or a system variable\&. "
+.ti -1c
+.RI "uint8_t \fBNexcore_Set\fP (char *componentName, char *attribute, char *txt)"
+.br
+.RI "Sets the value of a component's attribute or a system variable\&. "
+.ti -1c
+.RI "uint8_t \fBNexcore_Page\fP (char *pageName)"
+.br
+.RI "Changes active page\&. "
+.ti -1c
+.RI "uint8_t \fBNexcore_Visible\fP (char *componentName, \fBBool_t\fP visible)"
+.br
+.RI "Makes a component visible or invisible\&. "
+.ti -1c
+.RI "uint8_t \fBNexcore_AddPointToWaveform\fP (uint8_t componentId, uint8_t channel, uint16_t y)"
+.br
+.RI "Adds point to waveform component's channel\&. "
+.ti -1c
+.RI "uint8_t \fBNexcore_ClearWaveform\fP (uint8_t componentId, uint8_t channel)"
+.br
+.RI "Clear waveform component's channel\&. "
+.ti -1c
+.RI "uint8_t \fBNexcore_Reset\fP (void)"
+.br
+.RI "Resets the screen\&. "
+.ti -1c
+.RI "uint8_t \fBNexcore_ParseReturnedString\fP (char *buff, uint8_t maxLength)"
+.br
+.RI "After receiving string return data; callback is invoked to inform this to the application program\&. Then the application program should call this function to parse the string from the internal receive buffer of the module\&. String can be parsed as chunks of strings or as a whole at a time\&. "
+.ti -1c
+.RI "__weak void \fBNexcore_ErrorCb\fP (uint8_t activeTransactionId, \fBNexcore_Error_t\fP error)"
+.br
+.RI "Default implementation of the error callback function\&. "
+.ti -1c
+.RI "__weak void \fBNexcore_InfoCb\fP (uint8_t activeTransactionId, \fBNexcore_Info_t\fP info)"
+.br
+.RI "Default implementation of the info callback function\&. "
+.ti -1c
+.RI "__weak void \fBNexcore_TouchEventCb\fP (uint8_t activeTransactionId, uint8_t pageId, uint8_t componentId, \fBBool_t\fP pressed)"
+.br
+.RI "Default implementation of the touch event callback function\&. "
+.ti -1c
+.RI "__weak void \fBNexcore_GetStringRspCb\fP (uint8_t activeTransactionId, uint8_t stringLength)"
+.br
+.RI "Default implementation of the get(string attribute) response callback function\&. Nexcore_ParseReturnedString function should be called after this function to parse the returned string\&. "
+.ti -1c
+.RI "__weak void \fBNexcore_GetNumberRspCb\fP (uint8_t ActiveTransactionId, uint32_t value)"
+.br
+.RI "Default implementation of the get(numeric attribute) response callback function\&. "
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "UART_HandleTypeDef \fBhuart1\fP"
+.br
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define NR_ASSIGNMENT_FAILED_TO_ASSIGN   ((uint8_t)0x1C)"
+
+.SS "#define NR_AUTO_ENTERED_SLEEP_MODE   ((uint8_t)0x86)"
+
+.SS "#define NR_AUTO_WAKE_FROM_SLEEP   ((uint8_t)0x87)"
+
+.SS "#define NR_CURRENT_PAGE_NUMBER   ((uint8_t)0x66)"
+
+.SS "#define NR_EEPROM_OPERATION_FAILED   ((uint8_t)0x1D)"
+
+.SS "#define NR_ESCAPE_CHARACTER_INVALID   ((uint8_t)0x20)"
+
+.SS "#define NR_INSTRUCTION_SUCCESSFUL   ((uint8_t)0x01)"
+
+.SS "#define NR_INVALID_BAUDRATE_SETTING   ((uint8_t)0x11)"
+
+.SS "#define NR_INVALID_COMPONENT_ID   ((uint8_t)0x02)"
+
+.SS "#define NR_INVALID_CRC   ((uint8_t)0x09)"
+
+.SS "#define NR_INVALID_FILE_OPERATION   ((uint8_t)0x06)"
+
+.SS "#define NR_INVALID_FONT_ID   ((uint8_t)0x05)"
+
+.SS "#define NR_INVALID_INSTRUCTION   ((uint8_t)0x00)"
+
+.SS "#define NR_INVALID_PAGE_ID   ((uint8_t)0x03)"
+
+.SS "#define NR_INVALID_PICTURE_ID   ((uint8_t)0x04)"
+
+.SS "#define NR_INVALID_QUANTITY_OF_PARAMETERS   ((uint8_t)0x1E)"
+
+.SS "#define NR_INVALID_VARIABLE_NAME_OR_ATTIRIBUTE   ((uint8_t)0x1A)"
+
+.SS "#define NR_INVALID_VARIABLE_OPERATION   ((uint8_t)0x1B)"
+
+.SS "#define NR_INVALID_WAVEFORM_ID_OR_CHANNEL   ((uint8_t)0x12)"
+
+.SS "#define NR_IO_OPERATION_FAILED   ((uint8_t)0x1F)"
+
+.SS "#define NR_NEXTION_READY   ((uint8_t)0x88)"
+
+.SS "#define NR_NUMERIC_DATA_ENCLOSED   ((uint8_t)0x71)"
+
+.SS "#define NR_SERIAL_BUFFER_OVERFLOW   ((uint8_t)0x24)"
+
+.SS "#define NR_START_MICROSD_UPGRAGE   ((uint8_t)0x89)"
+
+.SS "#define NR_TOUCH_COORDINATE_AWAKE   ((uint8_t)0x67)"
+
+.SS "#define NR_TOUCH_COORDINATE_SLEEP   ((uint8_t)0x68)"
+
+.SS "#define NR_TOUCH_EVENT   ((uint8_t)0x65)"
+
+.SS "#define NR_TRANSPARENT_DATA_FINISHED   ((uint8_t)0xFD)"
+
+.SS "#define NR_TRANSPARENT_DATA_READY   ((uint8_t)0xFE)"
+
+.SS "#define NR_VARIABLE_NAME_TOO_LONG   ((uint8_t)0x23)"
+
+.SS "#define NR_VARIED_STRING_DATA_ENCLOSED   ((uint8_t)0x70)"
+
+.SH "Function Documentation"
+.PP 
+.SS "uint8_t Nexcore_AddPointToWaveform (uint8_t componentId, uint8_t channel, uint16_t y)"
+
+.PP
+Adds point to waveform component's channel\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIcomponentId\fP Id of the component\&. 
+.br
+\fIchannel\fP Channel which the point will be added\&. 
+.br
+\fIy\fP Height of the point\&.
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fITransactionId\&.\fP 
+.RE
+.PP
+
+.SS "uint8_t Nexcore_ClearWaveform (uint8_t componentId, uint8_t channel)"
+
+.PP
+Clear waveform component's channel\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIcomponentId\fP Id of the component\&. 
+.br
+\fIchannel\fP Channel which will be cleared\&.
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fITransactionId\&.\fP 
+.RE
+.PP
+
+.SS "uint8_t Nexcore_EnqueueMsg (char ** chunks, uint8_t chunkCount)"
+
+.PP
+Concats the strings given as chunks and enqueues them to the module's TxQueue\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIchunks\fP Array of pointers to the strings\&. 
+.br
+\fIchunkCount\fP Number of chunks to be concatted\&.
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fITransactionId\&.\fP 
+.RE
+.PP
+
+.SS "__weak void Nexcore_ErrorCb (uint8_t activeTransactionId, \fBNexcore_Error_t\fP error)"
+
+.PP
+Default implementation of the error callback function\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIactiveTransactionId\fP Current transaction ID\&. 
+.br
+\fIerror\fP Error code\&. 
+.RE
+.PP
+
+.SS "void Nexcore_Execute (void)"
+
+.PP
+This function should be called to transfer control to this module to complete it's pending operations\&. 
+.SS "uint8_t Nexcore_Get (char * name, char * attribute)"
+
+.PP
+Gets the value of a component's attribute or a system variable\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIname\fP Name of the component or the system variable\&. 
+.br
+\fIattribute\fP Name of the component's attribute\&. NULL pointer if system variable is to be get\&.
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fITransactionId\&.\fP 
+.RE
+.PP
+
+.SS "__weak void Nexcore_GetNumberRspCb (uint8_t ActiveTransactionId, uint32_t value)"
+
+.PP
+Default implementation of the get(numeric attribute) response callback function\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIactiveTransactionId\fP Current transaction ID\&. 
+.br
+\fIvalue\fP Returned value\&. 
+.RE
+.PP
+
+.SS "__weak void Nexcore_GetStringRspCb (uint8_t activeTransactionId, uint8_t stringLength)"
+
+.PP
+Default implementation of the get(string attribute) response callback function\&. Nexcore_ParseReturnedString function should be called after this function to parse the returned string\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIactiveTransactionId\fP Current transaction ID\&. 
+.br
+\fIstringLength\fP Length of the returned string\&. 
+.RE
+.PP
+
+.SS "__weak void Nexcore_InfoCb (uint8_t activeTransactionId, \fBNexcore_Info_t\fP info)"
+
+.PP
+Default implementation of the info callback function\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIactiveTransactionId\fP Current transaction ID\&. 
+.br
+\fIerror\fP Info code\&. 
+.RE
+.PP
+
+.SS "void Nexcore_Init (void)"
+
+.PP
+Initializes module\&. 
+.SS "uint8_t Nexcore_Page (char * pageName)"
+
+.PP
+Changes active page\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIpageName\fP Name of the page to be activated\&.
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fITransactionId\&.\fP 
+.RE
+.PP
+
+.SS "uint8_t Nexcore_ParseReturnedString (char * buff, uint8_t maxLength)"
+
+.PP
+After receiving string return data; callback is invoked to inform this to the application program\&. Then the application program should call this function to parse the string from the internal receive buffer of the module\&. String can be parsed as chunks of strings or as a whole at a time\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbuff\fP Pointer of the buffer to put received string\&. 
+.br
+\fImaxLength\fP Length of the parsing\&.
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fICharacters\fP to parse\&. 
+.RE
+.PP
+
+.SS "uint8_t Nexcore_Reset (void)"
+
+.PP
+Resets the screen\&. 
+.SS "uint8_t Nexcore_Set (char * componentName, char * attribute, char * txt)"
+
+.PP
+Sets the value of a component's attribute or a system variable\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIname\fP Name of the component or the system variable\&. 
+.br
+\fIattribute\fP Name of the component's attribute\&. NULL pointer if system variable is to be set\&.
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fITransactionId\&.\fP 
+.RE
+.PP
+
+.SS "void Nexcore_Start (void)"
+
+.PP
+Starts the operation of the module\&. 
+.SS "void Nexcore_Stop (void)"
+
+.PP
+Stops the module\&. 
+.SS "__weak void Nexcore_TouchEventCb (uint8_t activeTransactionId, uint8_t pageId, uint8_t componentId, \fBBool_t\fP pressed)"
+
+.PP
+Default implementation of the touch event callback function\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIactiveTransactionId\fP Current transaction ID\&. 
+.br
+\fIpageId\fP Active page ID\&. 
+.br
+\fIcomponentId\fP ID of the component whom touch event is triggered\&. 
+.br
+\fIpressed\fP Touch event type; TRUE if pressed FALSE if released\&. 
+.RE
+.PP
+
+.SS "uint8_t Nexcore_Visible (char * componentName, \fBBool_t\fP visible)"
+
+.PP
+Makes a component visible or invisible\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIcomponentName\fP Name of the component\&. 
+.br
+\fIvisible\fP Set FALSE to make a component invisible\&. Set TRUE to make a component visible\&.
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fITransactionId\&.\fP 
+.RE
+.PP
+
+.SH "Variable Documentation"
+.PP 
+.SS "UART_HandleTypeDef huart1\fC [extern]\fP"
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for NextionForSTM32 from the source code\&.

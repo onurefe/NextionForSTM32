@@ -1,0 +1,268 @@
+ARM GAS  /tmp/ccK5qoY9.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"utilities.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.num2str,"ax",%progbits
+  16              		.align	1
+  17              		.global	num2str
+  18              		.arch armv7-m
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  22              		.fpu softvfp
+  24              	num2str:
+  25              	.LVL0:
+  26              	.LFB66:
+  27              		.file 1 "Src/utilities.c"
+   1:Src/utilities.c **** /**
+   2:Src/utilities.c ****   ******************************************************************************
+   3:Src/utilities.c ****   * @file   utilities.c
+   4:Src/utilities.c ****   * @author Onur Efe
+   5:Src/utilities.c ****   * @brief  Utility functions for general purpose.
+   6:Src/utilities.c ****   */
+   7:Src/utilities.c **** 
+   8:Src/utilities.c **** #include "utilities.h"
+   9:Src/utilities.c **** 
+  10:Src/utilities.c **** /* Exported functions ------------------------------------------------------*/
+  11:Src/utilities.c **** /**
+  12:Src/utilities.c ****  * @brief Converts an unsigned long integer to string.
+  13:Src/utilities.c ****  * 
+  14:Src/utilities.c ****  * @param num: Unsigned long integer.
+  15:Src/utilities.c ****  * @param str: Pointer to return string.
+  16:Src/utilities.c ****  */
+  17:Src/utilities.c **** void num2str(uint32_t num, char *str)
+  18:Src/utilities.c **** {
+  28              		.loc 1 18 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33              		.loc 1 18 1 is_stmt 0 view .LVU1
+  34 0000 70B4     		push	{r4, r5, r6}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 12
+  37              		.cfi_offset 4, -12
+  38              		.cfi_offset 5, -8
+  39              		.cfi_offset 6, -4
+  19:Src/utilities.c ****     uint8_t digits = 0;
+ARM GAS  /tmp/ccK5qoY9.s 			page 2
+
+
+  40              		.loc 1 19 5 is_stmt 1 view .LVU2
+  41              	.LVL1:
+  20:Src/utilities.c ****     uint8_t temp;
+  42              		.loc 1 20 5 view .LVU3
+  21:Src/utilities.c **** 
+  22:Src/utilities.c ****     // Obtain digits.
+  23:Src/utilities.c ****     while (num > 0)
+  43              		.loc 1 23 5 view .LVU4
+  19:Src/utilities.c ****     uint8_t temp;
+  44              		.loc 1 19 13 is_stmt 0 view .LVU5
+  45 0002 0022     		movs	r2, #0
+  46              	.LVL2:
+  47              	.L2:
+  48              		.loc 1 23 11 view .LVU6
+  49 0004 70B1     		cbz	r0, .L7
+  24:Src/utilities.c ****     {
+  25:Src/utilities.c ****         str[digits++] = 0x30 + (num % 10);
+  50              		.loc 1 25 9 is_stmt 1 view .LVU7
+  51              		.loc 1 25 37 is_stmt 0 view .LVU8
+  52 0006 0F4B     		ldr	r3, .L8
+  53 0008 A3FB0043 		umull	r4, r3, r3, r0
+  54 000c DB08     		lsrs	r3, r3, #3
+  55 000e 1D46     		mov	r5, r3
+  56 0010 03EB8303 		add	r3, r3, r3, lsl #2
+  57 0014 5C00     		lsls	r4, r3, #1
+  58 0016 031B     		subs	r3, r0, r4
+  59              		.loc 1 25 19 view .LVU9
+  60 0018 541C     		adds	r4, r2, #1
+  61              	.LVL3:
+  62              		.loc 1 25 30 view .LVU10
+  63 001a 3033     		adds	r3, r3, #48
+  64              		.loc 1 25 23 view .LVU11
+  65 001c 8B54     		strb	r3, [r1, r2]
+  26:Src/utilities.c ****         num /= 10;
+  66              		.loc 1 26 9 is_stmt 1 view .LVU12
+  67              		.loc 1 26 13 is_stmt 0 view .LVU13
+  68 001e 2846     		mov	r0, r5
+  69              	.LVL4:
+  25:Src/utilities.c ****         num /= 10;
+  70              		.loc 1 25 19 view .LVU14
+  71 0020 E2B2     		uxtb	r2, r4
+  72 0022 EFE7     		b	.L2
+  73              	.LVL5:
+  74              	.L7:
+  75              	.LBB2:
+  27:Src/utilities.c ****     }
+  28:Src/utilities.c **** 
+  29:Src/utilities.c ****     // Correct(reverse) order of the digits.
+  30:Src/utilities.c ****     for (uint8_t i = 0; i < digits; i++)
+  76              		.loc 1 30 18 view .LVU15
+  77 0024 0023     		movs	r3, #0
+  78 0026 06E0     		b	.L4
+  79              	.LVL6:
+  80              	.L5:
+  31:Src/utilities.c ****     {
+  32:Src/utilities.c ****         temp = str[i];
+  81              		.loc 1 32 9 is_stmt 1 discriminator 3 view .LVU16
+ARM GAS  /tmp/ccK5qoY9.s 			page 3
+
+
+  82              		.loc 1 32 14 is_stmt 0 discriminator 3 view .LVU17
+  83 0028 CD5C     		ldrb	r5, [r1, r3]	@ zero_extendqisi2
+  84              	.LVL7:
+  33:Src/utilities.c ****         str[i] = str[digits - (i + 1)];
+  85              		.loc 1 33 9 is_stmt 1 discriminator 3 view .LVU18
+  86              		.loc 1 33 34 is_stmt 0 discriminator 3 view .LVU19
+  87 002a 581C     		adds	r0, r3, #1
+  88              		.loc 1 33 29 discriminator 3 view .LVU20
+  89 002c 141A     		subs	r4, r2, r0
+  90              		.loc 1 33 21 discriminator 3 view .LVU21
+  91 002e 0E5D     		ldrb	r6, [r1, r4]	@ zero_extendqisi2
+  92              		.loc 1 33 16 discriminator 3 view .LVU22
+  93 0030 CE54     		strb	r6, [r1, r3]
+  34:Src/utilities.c ****         str[digits - (i + 1)] = temp;
+  94              		.loc 1 34 9 is_stmt 1 discriminator 3 view .LVU23
+  95              		.loc 1 34 31 is_stmt 0 discriminator 3 view .LVU24
+  96 0032 0D55     		strb	r5, [r1, r4]
+  30:Src/utilities.c ****     {
+  97              		.loc 1 30 38 discriminator 3 view .LVU25
+  98 0034 C3B2     		uxtb	r3, r0
+  99              	.LVL8:
+ 100              	.L4:
+  30:Src/utilities.c ****     {
+ 101              		.loc 1 30 5 discriminator 1 view .LVU26
+ 102 0036 9A42     		cmp	r2, r3
+ 103 0038 F6D8     		bhi	.L5
+ 104              	.LBE2:
+  35:Src/utilities.c ****     }
+  36:Src/utilities.c **** 
+  37:Src/utilities.c ****     // Add the null character.
+  38:Src/utilities.c ****     str[digits] = '\0';
+ 105              		.loc 1 38 5 is_stmt 1 view .LVU27
+ 106              		.loc 1 38 17 is_stmt 0 view .LVU28
+ 107 003a 0023     		movs	r3, #0
+ 108              	.LVL9:
+ 109              		.loc 1 38 17 view .LVU29
+ 110 003c 8B54     		strb	r3, [r1, r2]
+  39:Src/utilities.c **** }
+ 111              		.loc 1 39 1 view .LVU30
+ 112 003e 70BC     		pop	{r4, r5, r6}
+ 113              	.LCFI1:
+ 114              		.cfi_restore 6
+ 115              		.cfi_restore 5
+ 116              		.cfi_restore 4
+ 117              		.cfi_def_cfa_offset 0
+ 118 0040 7047     		bx	lr
+ 119              	.L9:
+ 120 0042 00BF     		.align	2
+ 121              	.L8:
+ 122 0044 CDCCCCCC 		.word	-858993459
+ 123              		.cfi_endproc
+ 124              	.LFE66:
+ 126              		.section	.text.strLen,"ax",%progbits
+ 127              		.align	1
+ 128              		.global	strLen
+ 129              		.syntax unified
+ 130              		.thumb
+ARM GAS  /tmp/ccK5qoY9.s 			page 4
+
+
+ 131              		.thumb_func
+ 132              		.fpu softvfp
+ 134              	strLen:
+ 135              	.LVL10:
+ 136              	.LFB67:
+  40:Src/utilities.c **** 
+  41:Src/utilities.c **** /**
+  42:Src/utilities.c ****  * @brief Gets string length.
+  43:Src/utilities.c ****  * 
+  44:Src/utilities.c ****  * @param str: Pointer of the string.
+  45:Src/utilities.c ****  * 
+  46:Src/utilities.c ****  * @retval Length of the string.
+  47:Src/utilities.c ****  */
+  48:Src/utilities.c **** uint16_t strLen(char *str)
+  49:Src/utilities.c **** {
+ 137              		.loc 1 49 1 is_stmt 1 view -0
+ 138              		.cfi_startproc
+ 139              		@ args = 0, pretend = 0, frame = 0
+ 140              		@ frame_needed = 0, uses_anonymous_args = 0
+ 141              		@ link register save eliminated.
+  50:Src/utilities.c ****     uint8_t i = 0;
+ 142              		.loc 1 50 5 view .LVU32
+  51:Src/utilities.c ****     uint16_t length = 0;
+ 143              		.loc 1 51 5 view .LVU33
+  52:Src/utilities.c ****     while (str[i] != '\0')
+ 144              		.loc 1 52 5 view .LVU34
+  51:Src/utilities.c ****     uint16_t length = 0;
+ 145              		.loc 1 51 14 is_stmt 0 view .LVU35
+ 146 0000 0023     		movs	r3, #0
+ 147              	.LVL11:
+ 148              	.L11:
+ 149              		.loc 1 52 15 view .LVU36
+ 150 0002 0278     		ldrb	r2, [r0]	@ zero_extendqisi2
+ 151              		.loc 1 52 11 view .LVU37
+ 152 0004 12B1     		cbz	r2, .L13
+  53:Src/utilities.c ****     {
+  54:Src/utilities.c ****         length++;
+ 153              		.loc 1 54 9 is_stmt 1 view .LVU38
+ 154              		.loc 1 54 15 is_stmt 0 view .LVU39
+ 155 0006 0133     		adds	r3, r3, #1
+ 156              	.LVL12:
+ 157              		.loc 1 54 15 view .LVU40
+ 158 0008 9BB2     		uxth	r3, r3
+ 159              	.LVL13:
+ 160              		.loc 1 54 15 view .LVU41
+ 161 000a FAE7     		b	.L11
+ 162              	.L13:
+  55:Src/utilities.c ****     }
+  56:Src/utilities.c **** 
+  57:Src/utilities.c ****     return length;
+ 163              		.loc 1 57 5 is_stmt 1 view .LVU42
+  58:Src/utilities.c **** }...
+ 164              		.loc 1 58 1 is_stmt 0 view .LVU43
+ 165 000c 1846     		mov	r0, r3
+ 166              	.LVL14:
+ 167              		.loc 1 58 1 view .LVU44
+ 168 000e 7047     		bx	lr
+ARM GAS  /tmp/ccK5qoY9.s 			page 5
+
+
+ 169              		.cfi_endproc
+ 170              	.LFE67:
+ 172              		.text
+ 173              	.Letext0:
+ 174              		.file 2 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/arm-none-eabi/include/machine
+ 175              		.file 3 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/arm-none-eabi/include/sys/_st
+ 176              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
+ 177              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 178              		.file 6 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/arm-none-eabi/include/sys/loc
+ 179              		.file 7 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/arm-none-eabi/include/sys/_ty
+ 180              		.file 8 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/lib/gcc/arm-none-eabi/8.2.1/i
+ 181              		.file 9 "/home/onur/STM32Toolchain/gcc-arm-none-eabi-8-2018-q4-major/arm-none-eabi/include/sys/ree
+ 182              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ARM GAS  /tmp/ccK5qoY9.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 utilities.c
+     /tmp/ccK5qoY9.s:16     .text.num2str:0000000000000000 $t
+     /tmp/ccK5qoY9.s:24     .text.num2str:0000000000000000 num2str
+     /tmp/ccK5qoY9.s:122    .text.num2str:0000000000000044 $d
+     /tmp/ccK5qoY9.s:127    .text.strLen:0000000000000000 $t
+     /tmp/ccK5qoY9.s:134    .text.strLen:0000000000000000 strLen
+
+NO UNDEFINED SYMBOLS

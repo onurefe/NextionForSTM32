@@ -1,0 +1,468 @@
+\hypertarget{nexcore_8h}{}\doxysection{Inc/nexcore.h File Reference}
+\label{nexcore_8h}\index{Inc/nexcore.h@{Inc/nexcore.h}}
+{\ttfamily \#include \char`\"{}global.\+h\char`\"{}}\newline
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a23cf3e4834622619aec51e534741c50e}{Nexcore\+\_\+\+Error\+\_\+t}}
+\item 
+typedef uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_aa1d9df5d83b2b1c79712fc532f242c5f}{Nexcore\+\_\+\+Info\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \newline
+\mbox{\hyperlink{global_8h_a06fc87d81c62e9abb8790b6e5713c55baa1e095cc966dbecf6a0d8aad75348d1a}{F\+A\+L\+SE}} = 0, 
+\mbox{\hyperlink{global_8h_a06fc87d81c62e9abb8790b6e5713c55baa82764c3079aea4e60c80e45befbb839}{T\+R\+UE}} = !\+F\+A\+L\+SE, 
+\mbox{\hyperlink{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55bad72df75e039cd4d46e622810924ab0ed}{N\+E\+X\+C\+O\+R\+E\+\_\+\+E\+R\+R\+O\+R\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+O\+P\+E\+R\+A\+T\+I\+ON}} = 0, 
+\mbox{\hyperlink{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55ba6dc06fa8de86232ba76e818768f59c46}{N\+E\+X\+C\+O\+R\+E\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+O\+M\+M\+U\+N\+I\+C\+A\+T\+I\+O\+N\+\_\+\+P\+R\+O\+B\+L\+EM}}, 
+\newline
+\mbox{\hyperlink{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55baf3144ee7e5c151ffa119cb8946e64226}{N\+E\+X\+C\+O\+R\+E\+\_\+\+E\+R\+R\+O\+R\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+O\+V\+E\+R\+F\+L\+OW}}, 
+\mbox{\hyperlink{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55ba5d7f9f43f3024f3eb6061a3761abaa9e}{N\+E\+X\+C\+O\+R\+E\+\_\+\+E\+R\+R\+O\+R\+\_\+\+N\+O\+\_\+\+R\+E\+S\+P\+O\+N\+SE}}, 
+\mbox{\hyperlink{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55bac56ab755d58c4bf1130b236d289aa0a5}{N\+E\+X\+C\+O\+R\+E\+\_\+\+E\+R\+R\+O\+R\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+R\+E\+C\+V\+\_\+\+M\+SG}}
+ \}
+\item 
+enum \{ \newline
+\mbox{\hyperlink{global_8h_adf764cbdea00d65edcd07bb9953ad2b7a2a68f51b73db179a30b6a8aea11f7485}{U\+N\+I\+N\+IT}} = 0, 
+\mbox{\hyperlink{global_8h_adf764cbdea00d65edcd07bb9953ad2b7a6564f2f3e15be06b670547bbcaaf0798}{R\+E\+A\+DY}}, 
+\mbox{\hyperlink{global_8h_adf764cbdea00d65edcd07bb9953ad2b7aa6d5861d902ad10e393b16836da927e9}{O\+P\+E\+R\+A\+T\+I\+NG}}, 
+\mbox{\hyperlink{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7a7f079ccc6b67c5b36133a0fc2b16f5b5}{N\+E\+X\+C\+O\+R\+E\+\_\+\+I\+N\+F\+O\+\_\+\+R\+E\+A\+DY}} = 0, 
+\newline
+\mbox{\hyperlink{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7a9153a7a0d90ce4abb1dcdacdc0b9daf5}{N\+E\+X\+C\+O\+R\+E\+\_\+\+I\+N\+F\+O\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+S\+U\+C\+C\+E\+S\+S\+F\+UL}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{nexcore_8h_a5a608ffd7699bb0bd8f1f16a3125ee46}{Nexcore\+\_\+\+Init}} (void)
+\begin{DoxyCompactList}\small\item\em Initializes module. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexcore_8h_ab7e9c12b6b3c68efd04907ee3672bd5e}{Nexcore\+\_\+\+Start}} (void)
+\begin{DoxyCompactList}\small\item\em Starts the operation of the module. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexcore_8h_a0b9cbe3e6bf2790a18d54136703c1520}{Nexcore\+\_\+\+Execute}} (void)
+\begin{DoxyCompactList}\small\item\em This function should be called to transfer control to this module to complete it\textquotesingle{}s pending operations. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexcore_8h_a9e241ac47d8a22d9dc00b3ded2d7c2ce}{Nexcore\+\_\+\+Stop}} (void)
+\begin{DoxyCompactList}\small\item\em Stops the module. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a920f5277b2e5a8f4d0ec452a8ac0d449}{Nexcore\+\_\+\+Parse\+Returned\+String}} (char $\ast$buff, uint8\+\_\+t max\+Length)
+\begin{DoxyCompactList}\small\item\em After receiving string return data; callback is invoked to inform this to the application program. Then the application program should call this function to parse the string from the internal receive buffer of the module. String can be parsed as chunks of strings or as a whole at a time. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a9a39a776964aedd6132231d127880151}{Nexcore\+\_\+\+Enqueue\+Msg}} (char $\ast$$\ast$chunks, uint8\+\_\+t chunk\+Count)
+\begin{DoxyCompactList}\small\item\em Concats the strings given as chunks and enqueues them to the module\textquotesingle{}s Tx\+Queue. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a711d4d5b245ad61a1cc32226d397ec87}{Nexcore\+\_\+\+Page}} (char $\ast$page\+Name)
+\begin{DoxyCompactList}\small\item\em Changes active page. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a8ade5644feb8221c2245fee9b8d74363}{Nexcore\+\_\+\+Get}} (char $\ast$component\+Name, char $\ast$attribute)
+\begin{DoxyCompactList}\small\item\em Gets the value of a component\textquotesingle{}s attribute or a system variable. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a83933b6a78509951f1b4665fd5530173}{Nexcore\+\_\+\+Set}} (char $\ast$component\+Name, char $\ast$attribute, char $\ast$txt)
+\begin{DoxyCompactList}\small\item\em Sets the value of a component\textquotesingle{}s attribute or a system variable. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a30f0dcaf05fcac5aefc18641956bb1b7}{Nexcore\+\_\+\+Visible}} (char $\ast$component\+Name, \mbox{\hyperlink{global_8h_aafeacc358724fc9bb80e4af135a13b04}{Bool\+\_\+t}} visible)
+\begin{DoxyCompactList}\small\item\em Makes a component visible or invisible. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a02fcdc27543b2ce3f4540b0383bedeae}{Nexcore\+\_\+\+Add\+Point\+To\+Waveform}} (uint8\+\_\+t component\+Id, uint8\+\_\+t channel, uint16\+\_\+t y)
+\begin{DoxyCompactList}\small\item\em Adds point to waveform component\textquotesingle{}s channel. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a949774dcbb391201ae5875fa07143ecd}{Nexcore\+\_\+\+Clear\+Waveform}} (uint8\+\_\+t component\+Id, uint8\+\_\+t channel)
+\begin{DoxyCompactList}\small\item\em Clear waveform component\textquotesingle{}s channel. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a868efc1ee10c9880516f62fc81bb3967}{Nexcore\+\_\+\+Reset}} (void)
+\begin{DoxyCompactList}\small\item\em Resets the screen. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexcore_8h_a563a98fd9a936d29f4a6a6b148bb27e1}{Nexcore\+\_\+\+Error\+Cb}} (uint8\+\_\+t active\+Transaction\+Id, \mbox{\hyperlink{nexcore_8h_a23cf3e4834622619aec51e534741c50e}{Nexcore\+\_\+\+Error\+\_\+t}} error)
+\begin{DoxyCompactList}\small\item\em Default implementation of the error callback function. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexcore_8h_abf5cf0b95f6e29a9dad6165d77db8bca}{Nexcore\+\_\+\+Info\+Cb}} (uint8\+\_\+t active\+Transaction\+Id, \mbox{\hyperlink{nexcore_8h_aa1d9df5d83b2b1c79712fc532f242c5f}{Nexcore\+\_\+\+Info\+\_\+t}} info)
+\begin{DoxyCompactList}\small\item\em Default implementation of the info callback function. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexcore_8h_a0ecbd35a456a6eed569d243f9c762f9d}{Nexcore\+\_\+\+Touch\+Event\+Cb}} (uint8\+\_\+t active\+Transaction\+Id, uint8\+\_\+t page\+Id, uint8\+\_\+t component\+Id, \mbox{\hyperlink{global_8h_aafeacc358724fc9bb80e4af135a13b04}{Bool\+\_\+t}} pressed)
+\begin{DoxyCompactList}\small\item\em Default implementation of the touch event callback function. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexcore_8h_ab1f3d46697aa10bfa05afde2c9d5922d}{Nexcore\+\_\+\+Get\+String\+Rsp\+Cb}} (uint8\+\_\+t active\+Transaction\+Id, uint8\+\_\+t string\+Length)
+\begin{DoxyCompactList}\small\item\em Default implementation of the get(string attribute) response callback function. Nexcore\+\_\+\+Parse\+Returned\+String function should be called after this function to parse the returned string. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{nexcore_8h_ac3231c78e3c0b2265ba2fe0f50d6e6d1}{Nexcore\+\_\+\+Get\+Number\+Rsp\+Cb}} (uint8\+\_\+t active\+Transaction\+Id, uint32\+\_\+t value)
+\begin{DoxyCompactList}\small\item\em Default implementation of the get(numeric attribute) response callback function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{nexcore_8h_a23cf3e4834622619aec51e534741c50e}\label{nexcore_8h_a23cf3e4834622619aec51e534741c50e}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Error\_t@{Nexcore\_Error\_t}}
+\index{Nexcore\_Error\_t@{Nexcore\_Error\_t}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Error\_t}{Nexcore\_Error\_t}}
+{\footnotesize\ttfamily typedef uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_a23cf3e4834622619aec51e534741c50e}{Nexcore\+\_\+\+Error\+\_\+t}}}
+
+\mbox{\Hypertarget{nexcore_8h_aa1d9df5d83b2b1c79712fc532f242c5f}\label{nexcore_8h_aa1d9df5d83b2b1c79712fc532f242c5f}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Info\_t@{Nexcore\_Info\_t}}
+\index{Nexcore\_Info\_t@{Nexcore\_Info\_t}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Info\_t}{Nexcore\_Info\_t}}
+{\footnotesize\ttfamily typedef uint8\+\_\+t \mbox{\hyperlink{nexcore_8h_aa1d9df5d83b2b1c79712fc532f242c5f}{Nexcore\+\_\+\+Info\+\_\+t}}}
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55b}\label{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55b}} 
+\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily anonymous enum}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FALSE@{FALSE}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!FALSE@{FALSE}}}\mbox{\Hypertarget{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55baa1e095cc966dbecf6a0d8aad75348d1a}\label{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55baa1e095cc966dbecf6a0d8aad75348d1a}} 
+F\+A\+L\+SE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TRUE@{TRUE}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!TRUE@{TRUE}}}\mbox{\Hypertarget{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55baa82764c3079aea4e60c80e45befbb839}\label{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55baa82764c3079aea4e60c80e45befbb839}} 
+T\+R\+UE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NEXCORE\_ERROR\_INVALID\_OPERATION@{NEXCORE\_ERROR\_INVALID\_OPERATION}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!NEXCORE\_ERROR\_INVALID\_OPERATION@{NEXCORE\_ERROR\_INVALID\_OPERATION}}}\mbox{\Hypertarget{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55bad72df75e039cd4d46e622810924ab0ed}\label{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55bad72df75e039cd4d46e622810924ab0ed}} 
+N\+E\+X\+C\+O\+R\+E\+\_\+\+E\+R\+R\+O\+R\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+O\+P\+E\+R\+A\+T\+I\+ON&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NEXCORE\_ERROR\_COMMUNICATION\_PROBLEM@{NEXCORE\_ERROR\_COMMUNICATION\_PROBLEM}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!NEXCORE\_ERROR\_COMMUNICATION\_PROBLEM@{NEXCORE\_ERROR\_COMMUNICATION\_PROBLEM}}}\mbox{\Hypertarget{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55ba6dc06fa8de86232ba76e818768f59c46}\label{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55ba6dc06fa8de86232ba76e818768f59c46}} 
+N\+E\+X\+C\+O\+R\+E\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+O\+M\+M\+U\+N\+I\+C\+A\+T\+I\+O\+N\+\_\+\+P\+R\+O\+B\+L\+EM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NEXCORE\_ERROR\_BUFFER\_OVERFLOW@{NEXCORE\_ERROR\_BUFFER\_OVERFLOW}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!NEXCORE\_ERROR\_BUFFER\_OVERFLOW@{NEXCORE\_ERROR\_BUFFER\_OVERFLOW}}}\mbox{\Hypertarget{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55baf3144ee7e5c151ffa119cb8946e64226}\label{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55baf3144ee7e5c151ffa119cb8946e64226}} 
+N\+E\+X\+C\+O\+R\+E\+\_\+\+E\+R\+R\+O\+R\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+O\+V\+E\+R\+F\+L\+OW&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NEXCORE\_ERROR\_NO\_RESPONSE@{NEXCORE\_ERROR\_NO\_RESPONSE}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!NEXCORE\_ERROR\_NO\_RESPONSE@{NEXCORE\_ERROR\_NO\_RESPONSE}}}\mbox{\Hypertarget{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55ba5d7f9f43f3024f3eb6061a3761abaa9e}\label{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55ba5d7f9f43f3024f3eb6061a3761abaa9e}} 
+N\+E\+X\+C\+O\+R\+E\+\_\+\+E\+R\+R\+O\+R\+\_\+\+N\+O\+\_\+\+R\+E\+S\+P\+O\+N\+SE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NEXCORE\_ERROR\_INVALID\_RECV\_MSG@{NEXCORE\_ERROR\_INVALID\_RECV\_MSG}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!NEXCORE\_ERROR\_INVALID\_RECV\_MSG@{NEXCORE\_ERROR\_INVALID\_RECV\_MSG}}}\mbox{\Hypertarget{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55bac56ab755d58c4bf1130b236d289aa0a5}\label{nexcore_8h_a06fc87d81c62e9abb8790b6e5713c55bac56ab755d58c4bf1130b236d289aa0a5}} 
+N\+E\+X\+C\+O\+R\+E\+\_\+\+E\+R\+R\+O\+R\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+R\+E\+C\+V\+\_\+\+M\+SG&\\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\Hypertarget{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7}\label{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7}} 
+\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily anonymous enum}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UNINIT@{UNINIT}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!UNINIT@{UNINIT}}}\mbox{\Hypertarget{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7a2a68f51b73db179a30b6a8aea11f7485}\label{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7a2a68f51b73db179a30b6a8aea11f7485}} 
+U\+N\+I\+N\+IT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{READY@{READY}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!READY@{READY}}}\mbox{\Hypertarget{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7a6564f2f3e15be06b670547bbcaaf0798}\label{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7a6564f2f3e15be06b670547bbcaaf0798}} 
+R\+E\+A\+DY&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OPERATING@{OPERATING}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!OPERATING@{OPERATING}}}\mbox{\Hypertarget{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7aa6d5861d902ad10e393b16836da927e9}\label{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7aa6d5861d902ad10e393b16836da927e9}} 
+O\+P\+E\+R\+A\+T\+I\+NG&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NEXCORE\_INFO\_READY@{NEXCORE\_INFO\_READY}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!NEXCORE\_INFO\_READY@{NEXCORE\_INFO\_READY}}}\mbox{\Hypertarget{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7a7f079ccc6b67c5b36133a0fc2b16f5b5}\label{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7a7f079ccc6b67c5b36133a0fc2b16f5b5}} 
+N\+E\+X\+C\+O\+R\+E\+\_\+\+I\+N\+F\+O\+\_\+\+R\+E\+A\+DY&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NEXCORE\_INFO\_INSTRUCTION\_SUCCESSFUL@{NEXCORE\_INFO\_INSTRUCTION\_SUCCESSFUL}!nexcore.h@{nexcore.h}}\index{nexcore.h@{nexcore.h}!NEXCORE\_INFO\_INSTRUCTION\_SUCCESSFUL@{NEXCORE\_INFO\_INSTRUCTION\_SUCCESSFUL}}}\mbox{\Hypertarget{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7a9153a7a0d90ce4abb1dcdacdc0b9daf5}\label{nexcore_8h_adf764cbdea00d65edcd07bb9953ad2b7a9153a7a0d90ce4abb1dcdacdc0b9daf5}} 
+N\+E\+X\+C\+O\+R\+E\+\_\+\+I\+N\+F\+O\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+S\+U\+C\+C\+E\+S\+S\+F\+UL&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{nexcore_8h_a02fcdc27543b2ce3f4540b0383bedeae}\label{nexcore_8h_a02fcdc27543b2ce3f4540b0383bedeae}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_AddPointToWaveform@{Nexcore\_AddPointToWaveform}}
+\index{Nexcore\_AddPointToWaveform@{Nexcore\_AddPointToWaveform}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_AddPointToWaveform()}{Nexcore\_AddPointToWaveform()}}
+{\footnotesize\ttfamily uint8\+\_\+t Nexcore\+\_\+\+Add\+Point\+To\+Waveform (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{component\+Id,  }\item[{uint8\+\_\+t}]{channel,  }\item[{uint16\+\_\+t}]{y }\end{DoxyParamCaption})}
+
+
+
+Adds point to waveform component\textquotesingle{}s channel. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em component\+Id} & Id of the component. \\
+\hline
+{\em channel} & Channel which the point will be added. \\
+\hline
+{\em y} & Height of the point.\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Transaction\+Id.} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{nexcore_8h_a949774dcbb391201ae5875fa07143ecd}\label{nexcore_8h_a949774dcbb391201ae5875fa07143ecd}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_ClearWaveform@{Nexcore\_ClearWaveform}}
+\index{Nexcore\_ClearWaveform@{Nexcore\_ClearWaveform}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_ClearWaveform()}{Nexcore\_ClearWaveform()}}
+{\footnotesize\ttfamily uint8\+\_\+t Nexcore\+\_\+\+Clear\+Waveform (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{component\+Id,  }\item[{uint8\+\_\+t}]{channel }\end{DoxyParamCaption})}
+
+
+
+Clear waveform component\textquotesingle{}s channel. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em component\+Id} & Id of the component. \\
+\hline
+{\em channel} & Channel which will be cleared.\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Transaction\+Id.} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{nexcore_8h_a9a39a776964aedd6132231d127880151}\label{nexcore_8h_a9a39a776964aedd6132231d127880151}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_EnqueueMsg@{Nexcore\_EnqueueMsg}}
+\index{Nexcore\_EnqueueMsg@{Nexcore\_EnqueueMsg}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_EnqueueMsg()}{Nexcore\_EnqueueMsg()}}
+{\footnotesize\ttfamily uint8\+\_\+t Nexcore\+\_\+\+Enqueue\+Msg (\begin{DoxyParamCaption}\item[{char $\ast$$\ast$}]{chunks,  }\item[{uint8\+\_\+t}]{chunk\+Count }\end{DoxyParamCaption})}
+
+
+
+Concats the strings given as chunks and enqueues them to the module\textquotesingle{}s Tx\+Queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em chunks} & Array of pointers to the strings. \\
+\hline
+{\em chunk\+Count} & Number of chunks to be concatted.\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Transaction\+Id.} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{nexcore_8h_a563a98fd9a936d29f4a6a6b148bb27e1}\label{nexcore_8h_a563a98fd9a936d29f4a6a6b148bb27e1}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_ErrorCb@{Nexcore\_ErrorCb}}
+\index{Nexcore\_ErrorCb@{Nexcore\_ErrorCb}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_ErrorCb()}{Nexcore\_ErrorCb()}}
+{\footnotesize\ttfamily void Nexcore\+\_\+\+Error\+Cb (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{active\+Transaction\+Id,  }\item[{\mbox{\hyperlink{nexcore_8h_a23cf3e4834622619aec51e534741c50e}{Nexcore\+\_\+\+Error\+\_\+t}}}]{error }\end{DoxyParamCaption})}
+
+
+
+Default implementation of the error callback function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em active\+Transaction\+Id} & Current transaction ID. \\
+\hline
+{\em error} & Error code. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{nexcore_8h_a0b9cbe3e6bf2790a18d54136703c1520}\label{nexcore_8h_a0b9cbe3e6bf2790a18d54136703c1520}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Execute@{Nexcore\_Execute}}
+\index{Nexcore\_Execute@{Nexcore\_Execute}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Execute()}{Nexcore\_Execute()}}
+{\footnotesize\ttfamily void Nexcore\+\_\+\+Execute (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+This function should be called to transfer control to this module to complete it\textquotesingle{}s pending operations. 
+
+\mbox{\Hypertarget{nexcore_8h_a8ade5644feb8221c2245fee9b8d74363}\label{nexcore_8h_a8ade5644feb8221c2245fee9b8d74363}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Get@{Nexcore\_Get}}
+\index{Nexcore\_Get@{Nexcore\_Get}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Get()}{Nexcore\_Get()}}
+{\footnotesize\ttfamily uint8\+\_\+t Nexcore\+\_\+\+Get (\begin{DoxyParamCaption}\item[{char $\ast$}]{name,  }\item[{char $\ast$}]{attribute }\end{DoxyParamCaption})}
+
+
+
+Gets the value of a component\textquotesingle{}s attribute or a system variable. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the component or the system variable. \\
+\hline
+{\em attribute} & Name of the component\textquotesingle{}s attribute. N\+U\+LL pointer if system variable is to be get.\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Transaction\+Id.} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{nexcore_8h_ac3231c78e3c0b2265ba2fe0f50d6e6d1}\label{nexcore_8h_ac3231c78e3c0b2265ba2fe0f50d6e6d1}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_GetNumberRspCb@{Nexcore\_GetNumberRspCb}}
+\index{Nexcore\_GetNumberRspCb@{Nexcore\_GetNumberRspCb}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_GetNumberRspCb()}{Nexcore\_GetNumberRspCb()}}
+{\footnotesize\ttfamily void Nexcore\+\_\+\+Get\+Number\+Rsp\+Cb (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{Active\+Transaction\+Id,  }\item[{uint32\+\_\+t}]{value }\end{DoxyParamCaption})}
+
+
+
+Default implementation of the get(numeric attribute) response callback function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em active\+Transaction\+Id} & Current transaction ID. \\
+\hline
+{\em value} & Returned value. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{nexcore_8h_ab1f3d46697aa10bfa05afde2c9d5922d}\label{nexcore_8h_ab1f3d46697aa10bfa05afde2c9d5922d}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_GetStringRspCb@{Nexcore\_GetStringRspCb}}
+\index{Nexcore\_GetStringRspCb@{Nexcore\_GetStringRspCb}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_GetStringRspCb()}{Nexcore\_GetStringRspCb()}}
+{\footnotesize\ttfamily void Nexcore\+\_\+\+Get\+String\+Rsp\+Cb (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{active\+Transaction\+Id,  }\item[{uint8\+\_\+t}]{string\+Length }\end{DoxyParamCaption})}
+
+
+
+Default implementation of the get(string attribute) response callback function. Nexcore\+\_\+\+Parse\+Returned\+String function should be called after this function to parse the returned string. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em active\+Transaction\+Id} & Current transaction ID. \\
+\hline
+{\em string\+Length} & Length of the returned string. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{nexcore_8h_abf5cf0b95f6e29a9dad6165d77db8bca}\label{nexcore_8h_abf5cf0b95f6e29a9dad6165d77db8bca}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_InfoCb@{Nexcore\_InfoCb}}
+\index{Nexcore\_InfoCb@{Nexcore\_InfoCb}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_InfoCb()}{Nexcore\_InfoCb()}}
+{\footnotesize\ttfamily void Nexcore\+\_\+\+Info\+Cb (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{active\+Transaction\+Id,  }\item[{\mbox{\hyperlink{nexcore_8h_aa1d9df5d83b2b1c79712fc532f242c5f}{Nexcore\+\_\+\+Info\+\_\+t}}}]{info }\end{DoxyParamCaption})}
+
+
+
+Default implementation of the info callback function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em active\+Transaction\+Id} & Current transaction ID. \\
+\hline
+{\em error} & Info code. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{nexcore_8h_a5a608ffd7699bb0bd8f1f16a3125ee46}\label{nexcore_8h_a5a608ffd7699bb0bd8f1f16a3125ee46}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Init@{Nexcore\_Init}}
+\index{Nexcore\_Init@{Nexcore\_Init}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Init()}{Nexcore\_Init()}}
+{\footnotesize\ttfamily void Nexcore\+\_\+\+Init (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Initializes module. 
+
+\mbox{\Hypertarget{nexcore_8h_a711d4d5b245ad61a1cc32226d397ec87}\label{nexcore_8h_a711d4d5b245ad61a1cc32226d397ec87}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Page@{Nexcore\_Page}}
+\index{Nexcore\_Page@{Nexcore\_Page}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Page()}{Nexcore\_Page()}}
+{\footnotesize\ttfamily uint8\+\_\+t Nexcore\+\_\+\+Page (\begin{DoxyParamCaption}\item[{char $\ast$}]{page\+Name }\end{DoxyParamCaption})}
+
+
+
+Changes active page. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em page\+Name} & Name of the page to be activated.\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Transaction\+Id.} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{nexcore_8h_a920f5277b2e5a8f4d0ec452a8ac0d449}\label{nexcore_8h_a920f5277b2e5a8f4d0ec452a8ac0d449}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_ParseReturnedString@{Nexcore\_ParseReturnedString}}
+\index{Nexcore\_ParseReturnedString@{Nexcore\_ParseReturnedString}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_ParseReturnedString()}{Nexcore\_ParseReturnedString()}}
+{\footnotesize\ttfamily uint8\+\_\+t Nexcore\+\_\+\+Parse\+Returned\+String (\begin{DoxyParamCaption}\item[{char $\ast$}]{buff,  }\item[{uint8\+\_\+t}]{max\+Length }\end{DoxyParamCaption})}
+
+
+
+After receiving string return data; callback is invoked to inform this to the application program. Then the application program should call this function to parse the string from the internal receive buffer of the module. String can be parsed as chunks of strings or as a whole at a time. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buff} & Pointer of the buffer to put received string. \\
+\hline
+{\em max\+Length} & Length of the parsing.\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Characters} & to parse. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{nexcore_8h_a868efc1ee10c9880516f62fc81bb3967}\label{nexcore_8h_a868efc1ee10c9880516f62fc81bb3967}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Reset@{Nexcore\_Reset}}
+\index{Nexcore\_Reset@{Nexcore\_Reset}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Reset()}{Nexcore\_Reset()}}
+{\footnotesize\ttfamily uint8\+\_\+t Nexcore\+\_\+\+Reset (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Resets the screen. 
+
+\mbox{\Hypertarget{nexcore_8h_a83933b6a78509951f1b4665fd5530173}\label{nexcore_8h_a83933b6a78509951f1b4665fd5530173}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Set@{Nexcore\_Set}}
+\index{Nexcore\_Set@{Nexcore\_Set}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Set()}{Nexcore\_Set()}}
+{\footnotesize\ttfamily uint8\+\_\+t Nexcore\+\_\+\+Set (\begin{DoxyParamCaption}\item[{char $\ast$}]{component\+Name,  }\item[{char $\ast$}]{attribute,  }\item[{char $\ast$}]{txt }\end{DoxyParamCaption})}
+
+
+
+Sets the value of a component\textquotesingle{}s attribute or a system variable. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the component or the system variable. \\
+\hline
+{\em attribute} & Name of the component\textquotesingle{}s attribute. N\+U\+LL pointer if system variable is to be set.\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Transaction\+Id.} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{nexcore_8h_ab7e9c12b6b3c68efd04907ee3672bd5e}\label{nexcore_8h_ab7e9c12b6b3c68efd04907ee3672bd5e}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Start@{Nexcore\_Start}}
+\index{Nexcore\_Start@{Nexcore\_Start}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Start()}{Nexcore\_Start()}}
+{\footnotesize\ttfamily void Nexcore\+\_\+\+Start (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Starts the operation of the module. 
+
+\mbox{\Hypertarget{nexcore_8h_a9e241ac47d8a22d9dc00b3ded2d7c2ce}\label{nexcore_8h_a9e241ac47d8a22d9dc00b3ded2d7c2ce}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Stop@{Nexcore\_Stop}}
+\index{Nexcore\_Stop@{Nexcore\_Stop}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Stop()}{Nexcore\_Stop()}}
+{\footnotesize\ttfamily void Nexcore\+\_\+\+Stop (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Stops the module. 
+
+\mbox{\Hypertarget{nexcore_8h_a0ecbd35a456a6eed569d243f9c762f9d}\label{nexcore_8h_a0ecbd35a456a6eed569d243f9c762f9d}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_TouchEventCb@{Nexcore\_TouchEventCb}}
+\index{Nexcore\_TouchEventCb@{Nexcore\_TouchEventCb}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_TouchEventCb()}{Nexcore\_TouchEventCb()}}
+{\footnotesize\ttfamily void Nexcore\+\_\+\+Touch\+Event\+Cb (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{active\+Transaction\+Id,  }\item[{uint8\+\_\+t}]{page\+Id,  }\item[{uint8\+\_\+t}]{component\+Id,  }\item[{\mbox{\hyperlink{global_8h_aafeacc358724fc9bb80e4af135a13b04}{Bool\+\_\+t}}}]{pressed }\end{DoxyParamCaption})}
+
+
+
+Default implementation of the touch event callback function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em active\+Transaction\+Id} & Current transaction ID. \\
+\hline
+{\em page\+Id} & Active page ID. \\
+\hline
+{\em component\+Id} & ID of the component whom touch event is triggered. \\
+\hline
+{\em pressed} & Touch event type; T\+R\+UE if pressed F\+A\+L\+SE if released. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{nexcore_8h_a30f0dcaf05fcac5aefc18641956bb1b7}\label{nexcore_8h_a30f0dcaf05fcac5aefc18641956bb1b7}} 
+\index{nexcore.h@{nexcore.h}!Nexcore\_Visible@{Nexcore\_Visible}}
+\index{Nexcore\_Visible@{Nexcore\_Visible}!nexcore.h@{nexcore.h}}
+\doxysubsubsection{\texorpdfstring{Nexcore\_Visible()}{Nexcore\_Visible()}}
+{\footnotesize\ttfamily uint8\+\_\+t Nexcore\+\_\+\+Visible (\begin{DoxyParamCaption}\item[{char $\ast$}]{component\+Name,  }\item[{\mbox{\hyperlink{global_8h_aafeacc358724fc9bb80e4af135a13b04}{Bool\+\_\+t}}}]{visible }\end{DoxyParamCaption})}
+
+
+
+Makes a component visible or invisible. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em component\+Name} & Name of the component. \\
+\hline
+{\em visible} & Set F\+A\+L\+SE to make a component invisible. Set T\+R\+UE to make a component visible.\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Transaction\+Id.} & \\
+\hline
+\end{DoxyRetVals}

@@ -1,0 +1,98 @@
+.TH "Inc/nexserial.h" 3 "Fri Aug 14 2020" "Version 1" "NextionForSTM32" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Inc/nexserial.h
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'global\&.h'\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBSerial_Init\fP (void)"
+.br
+.RI "Function to initialize the module\&. "
+.ti -1c
+.RI "void \fBSerial_Start\fP (void)"
+.br
+.RI "Function to start the module\&. "
+.ti -1c
+.RI "void \fBSerial_Stop\fP (void)"
+.br
+.RI "Function to stop the module\&. "
+.ti -1c
+.RI "\fBBool_t\fP \fBSerial_TxBuffAvailable\fP (void)"
+.br
+.RI "Returns if there are any empty space in the TxBuffer\&. "
+.ti -1c
+.RI "void \fBSerial_Transmit\fP (uint8_t *buff, uint16_t length)"
+.br
+.RI "Enqueues array of data to the TxBuffer and starts the transmission if it's not active\&. "
+.ti -1c
+.RI "uint16_t \fBSerial_GetRecvData\fP (uint8_t *buff, uint16_t maxLength)"
+.br
+.RI "Returns received data\&. "
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "uint16_t Serial_GetRecvData (uint8_t * buff, uint16_t maxLength)"
+
+.PP
+Returns received data\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbuff\fP Pointer of the buffer which the received data will be transferred\&. 
+.br
+\fImaxLength\fP Maximum length of data to be read\&.
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fILength\fP of the read\&. 
+.RE
+.PP
+
+.SS "void Serial_Init (void)"
+
+.PP
+Function to initialize the module\&. 
+.SS "void Serial_Start (void)"
+
+.PP
+Function to start the module\&. 
+.SS "void Serial_Stop (void)"
+
+.PP
+Function to stop the module\&. 
+.SS "void Serial_Transmit (uint8_t * buff, uint16_t length)"
+
+.PP
+Enqueues array of data to the TxBuffer and starts the transmission if it's not active\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbuff\fP Pointer of the array\&. 
+.br
+\fIlength\fP Element count of the array\&. 
+.RE
+.PP
+
+.SS "\fBBool_t\fP Serial_TxBuffAvailable (void)"
+
+.PP
+Returns if there are any empty space in the TxBuffer\&. 
+.PP
+\fBReturn values\fP
+.RS 4
+\fITRUE\fP if there are any space; FALSE if not\&. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for NextionForSTM32 from the source code\&.
